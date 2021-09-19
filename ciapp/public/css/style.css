@@ -1,0 +1,68 @@
+body { 
+    font: 16px arial, sans-serif; 
+    background-color: lightgray; 
+} 
+ 
+.container { 
+    width: 800px; 
+    margin: auto; 
+    background-color: white; 
+} 
+ 
+.header { 
+    padding-top: 20px; 
+    padding-right: 20px; 
+    padding-left: 20px; 
+} 
+ 
+.header .judul { 
+    font-size: 40px; 
+    font-weight: bold; 
+    margin-bottom: 5px; 
+} 
+ 
+.banner { 
+    height: 200px; 
+    background-image: url(https://picsum.photos/200); 
+    background-size: cover; 
+    border-top: 5px solid navy; 
+    border-bottom: 5px solid skyblue; 
+} 
+ 
+.isi { 
+    display: flex; 
+    margin: 5px; 
+} 
+ 
+.sidebar { 
+    width: 10rem; 
+    height: 60vh; 
+    border: 0.5px solid navy; 
+    background-color: navy; 
+    padding: 10px; 
+} 
+ 
+.content { 
+    margin-left: 5px; 
+    width: 100vh; 
+    height: 100%; 
+    padding-top: 10px; 
+    padding-left: 10px; 
+    padding-right: 5px; 
+    border: 0.5px solid skyblue; 
+} 
+ 
+.nav li { 
+    list-style: none; 
+    margin-bottom: 10px; 
+} 
+ 
+.nav li a { 
+    text-decoration: none; 
+    color: white; 
+} 
+ 
+.nav li a:hover { 
+    background-color: lightblue; 
+    color: navy; 
+}
