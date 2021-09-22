@@ -46,6 +46,10 @@ $routes->get('/biodata', 'Web::biodata');
 $routes->get('/hitung', 'Web::hitung');
 $routes->post('/hitung/proses', 'Web::proses');
 
+//route untuk employe
+$routes->get('/employe', 'Employe::index');
+$routes->post('/employe/save', 'Employe::save');
+
 
 
 /*

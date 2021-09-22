@@ -20,15 +20,14 @@ Modul ini menggunakan lisensi [Creative Common](https://creativecommons.org/lice
 - [Mengenal Route dan Controller](#mengenal-route-dan-controller)
 - [Mengenal View](#mengenal-view)
 - [Template Engine](#template-engine)
-- Membuat CRUD Tampil Data
-- Membuat CRUD Simpan Data
-- Membuat CRUD Ubah Data
+- [Membuat CRUD Tampil Data](#membuat-crud-tampil-data)
+- [Membuat CRUD Simpan Data](#membuat-crud-simpan-data)
+- Membuat CRUD Edit Data
 - Membuat CRUD Hapus Data
 - Tentang Migration dan Seeding
-- Membuat Fitur Autentifikasi
-- Membuat Restful API
-- Referensi
-- Tentang
+- Membuat Autentifikasi
+- Membuat Restfull API
+- [## Referensi](#referensi)
 
 ## Pengantar
 ---
@@ -925,7 +924,7 @@ Hasil dari `function getData()` dimasukan dalam array asosiatif dalam variable e
 
 berikut adalah file view **tampil_data.php** yang disimpan di folder **app/Views**
 
-```php
+```html
 <?= $this->extend('template/layout') ?>
 
 <?= $this->section('content'); ?>
@@ -1004,7 +1003,7 @@ Selain itu CI 4 memiliki builtin function seperti [Eloquent dalam Laravel](https
 
 Semisal kita ingin menampilkan semua data dalam tabel pengurus seperti diatas. kita cukup memanggil function findAll() dalam Controller tanpa perlu mendefinikasi fungsi tersebut dalam Model.
 
-Silahkan edit Model **EmployeModel.php** dan **hapus** *function construct dan getData()* seperti dibawah ini
+Silahkan edit Model **EmployeModel.php** dan **hapus atau comment** *function construct dan getData()* seperti dibawah ini
 
 ```php
 <?php
@@ -1052,6 +1051,172 @@ class Employe extends BaseController {
 ```
 
 Coba buka kembali url `http://localhost:8080/employe` Manakah yang menurut Anda lebih mudah??.
+
+## Membuat CRUD Simpan Data
+---
+
+Untuk operasi Tambah Data pertama kita definisikan function di Model **employeModel.php**
+
+```php
+<?php
+
+namespace App\Models;
+
+use CodeIgniter\Model;
+
+class EmployeModel extends Model {
+
+    protected $db;
+
+    protected $table='employes';
+
+    protected $primaryKey = 'id';
+
+    public function __construct() {
+        parent:: __construct();
+        //koneksikan ke database
+        $this->db = db_connect();
+       
+    }
+
+    public function getData() {
+        //code untuk tampil data sebelumnya disembunyikan
+    }
+
+    public function simpan($data) {
+        //simpan data ke database
+        $builder=$this->db->table($this->table);
+        $builder->insert($data);
+    }
+}
+```
+
+Pada code diatas kita gunakan query builder untuk proses penyimpanan data kita.
+
+Selanjutnya kita buat function baru di Controller **Employe.php**. Tambahkan 2 fungsi ini dibawah function index()
+
+```php
+public function create() {
+     $data['judul'] = 'Add Employe';
+     return view('tambah_data',$data);
+}
+
+public function save() {
+     //ambil data dari form dan masukan ke array
+     $data=[
+         'id' => $this->request->getPost('id'),
+         'nama' => $this->request->getPost('nama'),
+         'alamat' => $this->request->getPost('alamat'),
+         'gender' => $this->request->getPost('gender'),
+         'gaji' => $this->request->getPost('gaji')
+     ];
+
+     //panggil function save di model
+     $this->employeModel->simpan($data);
+     //kembali ke table employe
+     return redirect()->to('/employe');
+}
+```
+
+`function create()` digunakan untuk menampilkan form tambah data. Sedangkan `function save()` digunakan untuk proses penyimpanan data setelah ditekan tombol save di form. Dimana masing-masing data dari form tersimpan dalam suatu asosiatif array. Coding `return redirect()->to('/employe');` digunakan untuk mengembalikan ke tampil data setelah operasi berhasil dilakukan.
+
+Selanjutnya kita buat file view **tambah_data.php**
+
+```html
+<?= $this->extend('template/layout') ?>
+
+<?= $this->section('content'); ?>
+<div class="content"> 
+    <h2 align="center"><?= $judul; ?></h2>
+    <form action="/employe/save" method="post">
+    <?= csrf_field(); ?>
+        <table align="center">
+            <tr>
+                <td>ID</td>
+                <td><input type="text" name="id"></td>
+            </tr>
+            <tr>
+                <td>Nama</td>
+                <td><input type="text" name="nama"></td>
+            </tr>
+            <tr>
+                <td>Alamat</td>
+                <td><textarea name="alamat" id="" rows="5"></textarea></td>
+            </tr>
+            <tr>
+                <td>Gender</td>
+                <td>
+                    <select name="gender" >
+                        <option value="L">Laki-laki</option>
+                        <option value="P">Perempuan</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Gaji</td>
+                <td><input type="text" name="gaji"></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <button type="submit">Save</button>
+                    <a href="/employe">
+                        <button type="button">Cancel</button>
+                    </a>
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+
+<?= $this->endSection(); ?>
+```
+
+Coba buka url `http://localhost:8080/employe/create` isikan data dan tekan tombol save.
+
+bila kita ingin Menggunakan function Model CI 4 untuk mempersingkat code. Silahkan edit Model **EmployeModel.php** anda bisa **comment atau hapus** `function simpan()` dan tambahkan coding `protected $allowedFields = ['id', 'nama', 'alamat', 'gender', 'gaji'];` untuk properti class EmployeModel.
+
+```php
+<?php
+
+namespace App\Models;
+
+use CodeIgniter\Model;
+
+class EmployeModel extends Model {
+
+    protected $db;
+
+    protected $table='employes';
+
+    protected $primaryKey = 'id';
+
+    protected $allowedFields = ['id', 'nama', 'alamat', 'gender', 'gaji'];
+
+}
+```
+
+Kemudian kita ubah coding `$this->employeModel->simpan($data);` pada Controller **Employe.php** menjadi `$this->employeModel->insert($data);` seperti dibawah ini
+
+```php
+public function save() {
+    //ambil data dari form dan masukan ke array
+    $data=[
+        'id' => $this->request->getPost('id'),
+        'nama' => $this->request->getPost('nama'),
+        'alamat' => $this->request->getPost('alamat'),
+        'gender' => $this->request->getPost('gender'),
+        'gaji' => $this->request->getPost('gaji')
+    ];
+
+    //menggunakan function Model Insert
+    $this->employeModel->insert($data);
+    //kembali ke table employe
+    return redirect()->to('/employe');
+}
+```
+
+Coba buka kemblli url `http://localhost:8080/employe/create` dan lakukan penambahan data dan amatilah.
 
 ## Referensi
 ---
