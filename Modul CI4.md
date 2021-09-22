@@ -819,6 +819,240 @@ Dari sini bisa kita simpulkan bahwa kegunaan sistem templating adalah :
 6. Sesuaikan menu dan kontennya dengan laman-laman diatas
 
 
+## Membuat CRUD Tampil Data
+---
+
+Pada tahap ini kita akan mengenal salah satu komponen MVC yaitu Model, Dimana fungsinya adalah mengelola segala macam pengelolaan sumber daya data dalam aplikasi kita. Kita akan membuat aplikasi CRUD *(Create, Read, Update dan Delete)* untuk data pegawai atau employe.
+
+Untuk praktikum silahkan buka xampp dan jalankan *web server apache dan database mysql*.Kita buat database baru dengan nama **company** dimana terdapat tabel dengan nama **employes**. 
+
+Untuk tabel employes anda bisa paste SQL dibawah untuk membuatnya
+
+```sql
+CREATE TABLE `employes` (
+`id` int(4) NOT NULL,
+`nama` varchar(30) DEFAULT NULL,
+`alamat` text DEFAULT NULL,
+`gender` enum('L','P') DEFAULT NULL,
+`gaji` int(10) DEFAULT NULL,
+`created_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE
+current_timestamp(),
+`updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+ALTER TABLE `employes`
+ADD PRIMARY KEY (`id`);
+
+```
+Selanjutnya kita ubah konfigurasi file **.env** untuk koneksi ke database
+
+```console
+#--------------------------------------------------------------------
+# DATABASE
+#--------------------------------------------------------------------
+
+database.default.hostname = localhost
+database.default.database = company
+database.default.username = root
+database.default.password = 
+database.default.DBDriver = MySQLi
+# database.default.DBPrefix =
+
+```
+
+buka tanda pagar (#) pada bagian hostname, serta masukan username dan password untuk user MySQL serta nama database company yang telah kita buat sebelumnya. Jangan lupa untuk menyimpannya.
+
+Selanjutnya kita buat File Model dengan nama **EmployeModel.php** di folder **app/Models** sebagai berikut
+
+```php
+<?php
+
+namespace App\Models;
+
+use CodeIgniter\Model;
+
+class EmployeModel extends Model {
+
+    //membuat properti untuk Model
+    protected $db;
+
+    public function __construct() {
+        parent:: __construct();
+        //koneksikan ke database
+        $this->db = db_connect();
+    }
+
+    public function getData() {
+        //query
+        $query="SELECT * FROM employes";
+        //ambil data dan jadikan array
+        $data=$this->db->query($query)->getResultArray();
+        return $data;
+    }
+}
+```
+Coding `db_connect()` digunakan untuk mengkoneksikan Model dengan database kita. fungsi `getData()` digunakan untuk menampilkan semua data dari table employe dan mengembalikannya untuk disimpan dalam variable `$data`.
+
+Selanjutnya kita buat Controller baru dengan nama **Employe.php**
+
+```php
+<?php
+
+namespace App\Controllers;
+
+class Employe extends BaseController {
+
+    protected $employeModel;
+
+    public function __construct() {
+        //load model
+        $this->employeModel=new \App\Models\EmployeModel();
+    }
+   
+    public function index() {
+        // memasukan semua data dalam array
+        $data['judul']='CRUD Employe'; 
+        //memanggil fungsi dari model
+        $data['employe']=$this->employeModel->getData(); 
+        //Menampilkan hasil ke view
+        return view('tampil_data',$data);
+    }
+}
+```
+
+kita load Model dengan code `$this->employeModel=new \App\Models\EmployeModel();` pada constructor agar ditiap function dalam Controller bisa memanggilnya berulang-ulang. 
+Hasil dari `function getData()` dimasukan dalam array asosiatif dalam variable employe yang dikirimkan ke view.
+
+berikut adalah file view **tampil_data.php** yang disimpan di folder **app/Views**
+
+```php
+<?= $this->extend('template/layout') ?>
+
+<?= $this->section('content'); ?>
+<div class="content"> 
+    <h2 align="center">CRUD Employe</h2>
+    <table border="1" align="center">
+        <tr>
+            <th>ID</th>
+            <th>Nama</th>
+            <th>Alamat</th>
+            <th>Gender</th>
+            <th>Gaji</th>
+            <th>Aksi</th>
+        </tr>
+<?php foreach($employe as $row): ?>
+        <tr>
+            <td><?= $row['id'];?></td>
+            <td><?= $row['nama'];?></td>
+            <td><?= $row['alamat'];?></td>
+            <td><?= $row['gender'];?></td>
+            <td><?= $row['gaji'];?></td>
+            <td>edit | delete</td>
+        </tr>
+<?php endforeach;?>
+    </table>
+</div> 
+<?= $this->endSection(); ?>
+```
+Disini kita gunakan template engine yang sudah dibuat sebelumnya agar tampilannya menarik. Untuk Coding `foreach($employe as $row):` digunakan untuk menampilan data dari Controller secara iterasi atau perulangan yang dirender dalam array.
+
+Silahkan buka url `http://localhost:8080/employe` dan amati hasilnya.
+
+Dalam CodeIgniter ada yang namanya Query Builder. **Query Builder** adalah class yang disediakan oleh codeigniter, yang digunakan untuk berkomunikasi dengan database, dengan adanya query builder, anda dapat melakukan perintah seperti *insert, select, update & delete*, dengan perintah query yang lebih minimal. 
+
+Coba edit file Model **EmployeModel.php** menjadi dibawah ini
+
+```php
+<?php
+
+namespace App\Models;
+
+use CodeIgniter\Model;
+
+class EmployeModel extends Model {
+
+    protected $db;
+
+    //tambahkan properti untuk nama table
+    protected $table='employes';
+
+    public function __construct() {
+        parent:: __construct();
+        //koneksikan ke database
+        $this->db = db_connect();
+    }
+
+    public function getData() {
+        //query
+        // $query="SELECT * FROM employes";
+        //ambil data dan jadikan array
+        // return $data=$this->db->query($query)->getResultArray();
+        //hapus code diatas
+        //ganti dengan query builder diatas
+        $builder=$this->db->table($this->table);
+        return $data=$builder->get()->getResultArray();
+    }
+}
+```
+Disini perlu menambahkan properti class untuk nama table `protected $table='employes';` kemudian kita buat query builder dengan code `$builder=$this->db->table($this->table);`. Untuk query `SELECT * FROM employes` bisa digantikan dengan `$data=$builder->get()`
+
+Coba buka kembali url `http://localhost:8080/employe` dan amati hasilnya.
+
+Dengan query builder kita tidak perlu menuliskan query lengkap untuk memanipulasi data kita. Ada berbagai macam fungsi seperti *get(), select(), limit(), insert(), update(), delete()* dan lainya untuk menggantikan query database. Selengkapnya bisa merujuk ke [https://codeigniter.com/user_guide/database/query_builder.html](https://codeigniter.com/user_guide/database/query_builder.html).
+
+Selain itu CI 4 memiliki builtin function seperti [Eloquent dalam Laravel](https://laravel.com/docs/8.x/eloquent#introduction) untuk lebih mempermudah kita dalam memanipulasi data dengan Model. 
+
+Semisal kita ingin menampilkan semua data dalam tabel pengurus seperti diatas. kita cukup memanggil function findAll() dalam Controller tanpa perlu mendefinikasi fungsi tersebut dalam Model.
+
+Silahkan edit Model **EmployeModel.php** dan **hapus** *function construct dan getData()* seperti dibawah ini
+
+```php
+<?php
+
+namespace App\Models;
+
+use CodeIgniter\Model;
+
+class EmployeModel extends Model {
+
+    protected $db;
+    //tambahkan properti untuk nama table
+    protected $table='employes';
+    //tambahkan properti untuk primary Key table
+    protected $primaryKey = 'id';
+
+    
+}
+```
+Disini perlu kita definiskasi primary key dari tabel dalam hal ini primary key kita adalah id. Untuk konfiguirasi lengkap bisa merujuk ke [https://codeigniter.com/user_guide/models/model.html](https://codeigniter.com/user_guide/models/model.html).
+
+Selanjutnya kita edit controller **Employe.php** dimana code `$data['employe']=$this->employeModel->getData();` kita ganti dengan `$data['employe']=$this->employeModel->findAll(); ` seperti dibawah ini.
+
+```php
+<?php
+
+namespace App\Controllers;
+
+class Employe extends BaseController {
+
+    protected $employeModel;
+
+    public function __construct() {
+        //load model
+        $this->employeModel=new \App\Models\EmployeModel();
+    }
+   
+    public function index() {
+        $data['judul']='CRUD Employe'; 
+        //ganti dengan function findAll()
+        $data['employe']=$this->employeModel->findAll(); 
+        return view('tampil_data',$data);
+    }
+}
+```
+
+Coba buka kembali url `http://localhost:8080/employe` Manakah yang menurut Anda lebih mudah??.
+
 ## Referensi
 ---
 
@@ -827,3 +1061,4 @@ Dari sini bisa kita simpulkan bahwa kegunaan sistem templating adalah :
 - [https://rudyekoprasetya.wordpress.com/2020/04/02/belajar-framework-code-igniter/](https://rudyekoprasetya.wordpress.com/2020/04/02/belajar-framework-code-igniter/)
 - [https://en.wikipedia.org/wiki/Rasmus_Lerdorf](https://en.wikipedia.org/wiki/Rasmus_Lerdorf)
 - [https://www.warungbelajar.com/penanganan-form-dan-form-validasi-di-codeigniter-4.html](https://www.warungbelajar.com/penanganan-form-dan-form-validasi-di-codeigniter-4.html)
+-[https://www.warungbelajar.com/cara-menggunakan-query-builder-di-codeigniter.html](https://www.warungbelajar.com/cara-menggunakan-query-builder-di-codeigniter.html)
