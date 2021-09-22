@@ -1172,6 +1172,14 @@ Selanjutnya kita buat file view **tambah_data.php**
 <?= $this->endSection(); ?>
 ```
 
+Kita bisa definisikan route di file **Route.php** untuk tampil data dan simpan data agar lebih terstruktur
+
+```php
+//route untuk employe
+$routes->get('/employe', 'Employe::index');
+$routes->post('/employe/save', 'Employe::save');
+```
+
 Coba buka url `http://localhost:8080/employe/create` isikan data dan tekan tombol save.
 
 bila kita ingin Menggunakan function Model CI 4 untuk mempersingkat code. Silahkan edit Model **EmployeModel.php** anda bisa **comment atau hapus** `function simpan()` dan tambahkan coding `protected $allowedFields = ['id', 'nama', 'alamat', 'gender', 'gaji'];` untuk properti class EmployeModel.
