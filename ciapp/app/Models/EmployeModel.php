@@ -36,4 +36,18 @@ class EmployeModel extends Model {
     //     $builder=$this->db->table($this->table);
     //     $builder->insert($data);
     // }
+
+    // public function getDataByID($id) {
+    //     $builder=$this->db->table($this->table);
+    //     //ambil data berdasarkan id
+    //     //SELECT * FROM employe WHERE id='$id'
+    //     return $data=$builder->getWhere([ 'id' => $id ])->getResultArray();
+    // }
+
+    // public function ubah($key,$data) {
+    //     $builder=$this->db->table($this->table);
+    //     //ubah data dalam tabel
+    //     //update employe set field1, field2 WHERE id='$id'
+    //     $builder->update($key,$data);
+    // }
 }

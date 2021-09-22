@@ -49,6 +49,9 @@ $routes->post('/hitung/proses', 'Web::proses');
 //route untuk employe
 $routes->get('/employe', 'Employe::index');
 $routes->post('/employe/save', 'Employe::save');
+//untuk edit dan ubah
+$routes->get('/employe/(:any)/edit', 'Employe::edit/$1');
+$routes->put('/employe', 'Employe::update');
 
 
 

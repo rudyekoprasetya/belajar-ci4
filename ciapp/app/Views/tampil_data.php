@@ -20,7 +20,9 @@
             <td><?= $row['alamat'];?></td>
             <td><?= $row['gender'];?></td>
             <td><?= $row['gaji'];?></td>
-            <td>edit | delete</td>
+            <td>
+               <a href="/employe/<?= $row['id'];?>/edit">edit</a>  | delete
+            </td>
         </tr>
 <?php endforeach;?>
     </table>

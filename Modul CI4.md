@@ -22,7 +22,7 @@ Modul ini menggunakan lisensi [Creative Common](https://creativecommons.org/lice
 - [Template Engine](#template-engine)
 - [Membuat CRUD Tampil Data](#membuat-crud-tampil-data)
 - [Membuat CRUD Simpan Data](#membuat-crud-simpan-data)
-- Membuat CRUD Edit Data
+- [Membuat CRUD Edit Data](#membuat-crud-edit-data)
 - Membuat CRUD Hapus Data
 - Tentang Migration dan Seeding
 - Membuat Autentifikasi
@@ -955,7 +955,7 @@ berikut adalah file view **tampil_data.php** yang disimpan di folder **app/Views
 ```
 Disini kita gunakan template engine yang sudah dibuat sebelumnya agar tampilannya menarik. Untuk Coding `foreach($employe as $row):` digunakan untuk menampilan data dari Controller secara iterasi atau perulangan yang dirender dalam array.
 
-Silahkan buka url `http://localhost:8080/employe` dan amati hasilnya.
+Coba tambahkan beberapa data dalam table employe kemudiaan silahkan buka url `http://localhost:8080/employe` dan amati hasilnya.
 
 Dalam CodeIgniter ada yang namanya Query Builder. **Query Builder** adalah class yang disediakan oleh codeigniter, yang digunakan untuk berkomunikasi dengan database, dengan adanya query builder, anda dapat melakukan perintah seperti *insert, select, update & delete*, dengan perintah query yang lebih minimal. 
 
@@ -987,7 +987,7 @@ class EmployeModel extends Model {
         //ambil data dan jadikan array
         // return $data=$this->db->query($query)->getResultArray();
         //hapus code diatas
-        //ganti dengan query builder diatas
+        //ganti query builder diatas menjadi dibawah ini
         $builder=$this->db->table($this->table);
         return $data=$builder->get()->getResultArray();
     }
@@ -1128,7 +1128,7 @@ Selanjutnya kita buat file view **tambah_data.php**
 <?= $this->section('content'); ?>
 <div class="content"> 
     <h2 align="center"><?= $judul; ?></h2>
-    <form action="/employe/save" method="post">
+    <form action="/employe" method="post">
     <?= csrf_field(); ?>
         <table align="center">
             <tr>
@@ -1177,12 +1177,12 @@ Kita bisa definisikan route di file **Route.php** untuk tampil data dan simpan d
 ```php
 //route untuk employe
 $routes->get('/employe', 'Employe::index');
-$routes->post('/employe/save', 'Employe::save');
+$routes->post('/employe', 'Employe::save');
 ```
 
 Coba buka url `http://localhost:8080/employe/create` isikan data dan tekan tombol save.
 
-bila kita ingin Menggunakan function Model CI 4 untuk mempersingkat code. Silahkan edit Model **EmployeModel.php** anda bisa **comment atau hapus** `function simpan()` dan tambahkan coding `protected $allowedFields = ['id', 'nama', 'alamat', 'gender', 'gaji'];` untuk properti class EmployeModel.
+bila kita ingin Menggunakan function Model CI 4 untuk mempersingkat code. Silahkan edit Model **EmployeModel.php** anda bisa **comment atau hapus** `function simpan()` dan tambahkan coding `protected $allowedFields = ['id', 'nama', 'alamat', 'gender', 'gaji'];` sebagai properti class EmployeModel, dimana ini berfungsi untuk Field atau kolom mana yang bisa di isi.
 
 ```php
 <?php
@@ -1194,11 +1194,11 @@ use CodeIgniter\Model;
 class EmployeModel extends Model {
 
     protected $db;
-
+    //nama tabel
     protected $table='employes';
-
+    //field primary key
     protected $primaryKey = 'id';
-
+    //kolom mana yang boleh diisi
     protected $allowedFields = ['id', 'nama', 'alamat', 'gender', 'gaji'];
 
 }
@@ -1225,6 +1225,241 @@ public function save() {
 ```
 
 Coba buka kemblli url `http://localhost:8080/employe/create` dan lakukan penambahan data dan amatilah.
+
+
+## Membuat CRUD Edit Data
+---
+
+Untuk membuat edit data pertama kita buat tambahkan function di Model **ModelEmploye.php** 
+
+```php
+<?php
+
+namespace App\Models;
+
+use CodeIgniter\Model;
+
+class EmployeModel extends Model {
+
+    protected $db;
+
+    protected $table='employes';
+
+    protected $primaryKey = 'id';
+
+    protected $allowedFields = ['id', 'nama', 'alamat', 'gender', 'gaji'];
+
+
+    public function __construct() {
+        parent:: __construct();
+        //koneksikan ke database
+        $this->db = db_connect();
+       
+    }
+
+    public function getData() {
+        //fungsi untuk tampil data sebelumnya disembunyikan
+    }
+
+    public function simpan($data) {
+        //fungsi simpan data ke database sebelumnya disembunyikan
+    }
+
+    public function getDataByID($id) {
+        $builder=$this->db->table($this->table);
+        //ambil data berdasarkan id
+        //SELECT * FROM employe WHERE id='$id'
+        return $data=$builder->getWhere([ 'id' => $id ])->getResultArray();
+    }
+
+    public function ubah($data,$key) {
+        $builder=$this->db->table($this->table);
+        //ubah data dalam tabel
+        //update employe set field1, field2 WHERE id='$id'
+        $builder->update($data,$key);
+    }
+}
+```
+
+fungsi `getDataByID($id)` berguna untuk mencari data yang akan diedit dan ditampilkan ke form edit. Sedangkan fungsi `ubah($data,$key)` digunakan untuk update data ke database.
+
+Selanjutnya kita tambahkan fungsi di Controller **Employe.php** dibawah fungsi **save**
+
+```php
+public function edit($id) {
+    $data['judul']='Edit Employe';
+    //ambil data berdasarkan id yang dikirm
+    $data['employe']=$this->employeModel->getDataByID($id);
+    //tampilkan data di view 
+    return view('edit_data',$data);
+}
+
+public function update() {
+    //ambil data dari form dan masukan ke array
+    $data=[
+        'nama' => $this->request->getPost('nama'),
+        'alamat' => $this->request->getPost('alamat'),
+        'gender' => $this->request->getPost('gender'),
+        'gaji' => $this->request->getPost('gaji')
+    ];
+    //panggil fungsi ubah di model dan kirimkan datanya
+    $this->employeModel->ubah(['id' => $this->request->getPost('id')],$data);
+    //kembali ke table employe
+    return redirect()->to('/employe');
+}
+```
+kemudian kita buat routenya, tambahkan route untuk menampilkan data yang akan diedit dengan metode GET sedangkan untuk update datanya menggunakan PUT. Kenapa menggunakan PUT karena untuk stardar komunikasi HTTP untuk update data metode yang digunakan adalah PUT, namun kita tetap bisa menggunakan POST. 
+
+Buka file **Routes.php** tambahkan coding dibawah ini dibawah route sebelumnya
+
+```php
+//untuk edit dan ubah
+$routes->get('/employe/(:any)/edit', 'Employe::edit/$1');
+$routes->put('/employe', 'Employe::update');
+```
+
+Selanjutnya kita buat view untuk menampung data yang akan diedit dengan nama **edit_data.php**
+
+```html
+<?= $this->extend('template/layout') ?>
+
+<?= $this->section('content'); ?>
+<div class="content"> 
+    <h2 align="center"><?= $judul; ?></h2>
+    <form action="/employe/update" method="post">
+    <?= csrf_field(); ?>
+    <input type="hidden" name="_method" value="put">
+<?php foreach($employe as $row): ?>
+        <table align="center">
+            <tr>
+                <td>ID</td>
+                <td><input type="text" name="id" value="<?= $row['id'];?>" readonly></td>
+            </tr>
+            <tr>
+                <td>Nama</td>
+                <td><input type="text" name="nama" value="<?= $row['nama'];?>"></td>
+            </tr>
+            <tr>
+                <td>Alamat</td>
+                <td><textarea name="alamat" rows="5"><?= $row['alamat'];?></textarea></td>
+            </tr>
+            <tr>
+                <td>Gender</td>
+                <td>
+                    <select name="gender" >
+                        <option value="L">Laki-laki</option>
+                        <option value="P">Perempuan</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Gaji</td>
+                <td><input type="text" name="gaji" value="<?= $row['gaji'];?>"></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <button type="submit">Update</button>
+                    <a href="/employe">
+                        <button type="button">Cancel</button>
+                    </a>
+                </td>
+            </tr>
+        </table>
+<?php endforeach; ?>
+    </form>
+</div>
+
+<?= $this->endSection(); ?>
+```
+
+Pada coding diatas kita masukan value untuk masing-masing form sesuai dengan data. Coding `<input type="hidden" name="_method" value="put">` digunakan untuk merubah method yang digunakan menjadi PUT, karena kita set di route menggunakan PUT untuk operasi ubah datanya. 
+
+Jangan lupa kita lakukan penyesuaian pada view **tampil_data.php** untuk memberikan link edit pada tiap baris datanya
+
+```html
+<?= $this->extend('template/layout') ?>
+
+<?= $this->section('content'); ?>
+<div class="content"> 
+    <h2 align="center">CRUD Employe</h2>
+    <p align="center"><a href="/employe/create">Tambah Data</a></p>
+    <table border="1" align="center">
+        <tr>
+            <th>ID</th>
+            <th>Nama</th>
+            <th>Alamat</th>
+            <th>Gender</th>
+            <th>Gaji</th>
+            <th>Aksi</th>
+        </tr>
+<?php foreach($employe as $row): ?>
+        <tr>
+            <td><?= $row['id'];?></td>
+            <td><?= $row['nama'];?></td>
+            <td><?= $row['alamat'];?></td>
+            <td><?= $row['gender'];?></td>
+            <td><?= $row['gaji'];?></td>
+            <td>
+               <a href="/employe/<?= $row['id'];?>/edit">edit</a>  | delete
+            </td>
+        </tr>
+<?php endforeach;?>
+    </table>
+</div> 
+<?= $this->endSection(); ?>
+```
+Coba buka `http://localhost:8080/employe` coba klik link edit salah satu data dan amati hasilnya.
+
+Kita bisa pula menggunakan function singkat seperti operasi sebelumnya pada edit data ini. Buka Model **EmployeModel.php** berikan komentar atau hapus fungsi yang sudah dibuat tadi yaitu fungsi `getDataByID($id)` dan `ubah($data,$key)`.
+
+```php
+<?php
+
+namespace App\Models;
+
+use CodeIgniter\Model;
+
+class EmployeModel extends Model {
+
+    protected $db;
+
+    protected $table='employes';
+
+    protected $primaryKey = 'id';
+
+    protected $allowedFields = ['id', 'nama', 'alamat', 'gender', 'gaji'];
+}
+```
+Jangan lupa sesuaikan pula fungsi di Controller **Employe.php**, kita ubah fungsi `$data['employe']=$this->employeModel->getDataByID($id);` menjadi `$data['employe']=$this->employeModel->where('id', $id)->findAll();;` dan fungsi `$this->employeModel->ubah(['id' => $this->request->getPost('id')],$data);` menjadi ` $this->employeModel->update(['id' => $this->request->getPost('id')],$data);`
+
+```php
+public function edit($id) {
+        $data['judul']='Edit Employe';
+        
+        // gunakan fungsi Where()->findAll()
+        $data['employe']=$this->employeModel->where('id', $id)->findAll();;
+        //tampilkan data di view 
+        return view('edit_data',$data);
+    }
+
+    public function update() {
+        //ambil data dari form dan masukan ke array
+        $data=[
+            'nama' => $this->request->getPost('nama'),
+            'alamat' => $this->request->getPost('alamat'),
+            'gender' => $this->request->getPost('gender'),
+            'gaji' => $this->request->getPost('gaji')
+        ];
+       
+        // menggunakan fungsi update()
+        $this->employeModel->update(['id' => $this->request->getPost('id')],$data);
+        //kembali ke table employe
+        return redirect()->to('/employe');
+    }
+```
+
+Coba buka kembali `http://localhost:8080/employe` dan lakukan perubahan data didalamnya.
 
 ## Referensi
 ---
