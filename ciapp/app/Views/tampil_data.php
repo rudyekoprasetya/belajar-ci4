@@ -21,7 +21,8 @@
             <td><?= $row['gender'];?></td>
             <td><?= $row['gaji'];?></td>
             <td>
-               <a href="/employe/<?= $row['id'];?>/edit">edit</a>  | delete
+               <a href="/employe/<?= $row['id'];?>/edit">edit</a>  | 
+               <a href="/employe/<?= $row['id'];?>/delete" onclick="return confirm('Apakah Yakin?')">delete</a> 
             </td>
         </tr>
 <?php endforeach;?>

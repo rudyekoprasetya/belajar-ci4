@@ -23,11 +23,11 @@ Modul ini menggunakan lisensi [Creative Common](https://creativecommons.org/lice
 - [Membuat CRUD Tampil Data](#membuat-crud-tampil-data)
 - [Membuat CRUD Simpan Data](#membuat-crud-simpan-data)
 - [Membuat CRUD Edit Data](#membuat-crud-edit-data)
-- Membuat CRUD Hapus Data
+- [Membuat CRUD Hapus Data](#membuat-crud-hapus-data)
 - Tentang Migration dan Seeding
 - Membuat Autentifikasi
 - Membuat Restfull API
-- [## Referensi](#referensi)
+- [Referensi](#referensi)
 
 ## Pengantar
 ---
@@ -1435,31 +1435,171 @@ Jangan lupa sesuaikan pula fungsi di Controller **Employe.php**, kita ubah fungs
 
 ```php
 public function edit($id) {
-        $data['judul']='Edit Employe';
-        
-        // gunakan fungsi Where()->findAll()
-        $data['employe']=$this->employeModel->where('id', $id)->findAll();;
-        //tampilkan data di view 
-        return view('edit_data',$data);
-    }
+    $data['judul']='Edit Employe';
+    
+    // gunakan fungsi Where()->findAll()
+    $data['employe']=$this->employeModel->where('id', $id)->findAll();;
+    //tampilkan data di view 
+    return view('edit_data',$data);
+}
 
-    public function update() {
-        //ambil data dari form dan masukan ke array
-        $data=[
-            'nama' => $this->request->getPost('nama'),
-            'alamat' => $this->request->getPost('alamat'),
-            'gender' => $this->request->getPost('gender'),
-            'gaji' => $this->request->getPost('gaji')
-        ];
-       
-        // menggunakan fungsi update()
-        $this->employeModel->update(['id' => $this->request->getPost('id')],$data);
-        //kembali ke table employe
-        return redirect()->to('/employe');
-    }
+public function update() {
+    //ambil data dari form dan masukan ke array
+    $data=[
+        'nama' => $this->request->getPost('nama'),
+        'alamat' => $this->request->getPost('alamat'),
+        'gender' => $this->request->getPost('gender'),
+        'gaji' => $this->request->getPost('gaji')
+    ];
+    
+    // menggunakan fungsi update()
+    $this->employeModel->update(['id' => $this->request->getPost('id')],$data);
+    //kembali ke table employe
+    return redirect()->to('/employe');
+}
 ```
 
+
 Coba buka kembali `http://localhost:8080/employe` dan lakukan perubahan data didalamnya.
+
+
+## Membuat CRUD Hapus Data
+---
+
+Untuk membuat operasi hapus data kita tambahkn fungsi baru di Model **EmployeModel.php**
+
+```php
+<?php
+
+namespace App\Models;
+
+use CodeIgniter\Model;
+
+class EmployeModel extends Model {
+
+    protected $db;
+
+    protected $table='employes';
+
+   
+    public function __construct() {
+        parent:: __construct();
+        //koneksikan ke database
+        $this->db = db_connect();
+       
+    }
+
+    public function getData() {
+        //fungsi disembunyikan
+    }
+
+    public function simpan($data) {
+        //fungsi disembunyikan
+    }
+
+    public function getDataByID($id) {
+        //fungsi disembunyikan
+    }
+
+    public function ubah($key,$data) {
+        //fungsi disembunyikan
+    }
+
+    public function hapus($key) {
+        $builder=$this->db->table($this->table);
+        //hapus data sesuai id
+        //DELETE FROM employe WHERE id='$id'
+        $builder->delete($key);
+    }
+}
+```
+
+Selanjutnya kita buat fungsi destroy di controller **Employe.php**  dibawah fungsi sebelumnya.
+
+```php
+public function destroy($id) {
+    // hapus data berdasarkan id
+    $this->employeModel->hapus(['id' => $id]);
+    //kembali ke table employe
+    return redirect()->to('/employe');
+}
+```
+
+Kemudian kita sesuaikan untuk file view **tampil_data.php**
+
+```html
+<?= $this->extend('template/layout') ?>
+
+<?= $this->section('content'); ?>
+<div class="content"> 
+    <h2 align="center">CRUD Employe</h2>
+    <p align="center"><a href="/employe/create">Tambah Data</a></p>
+    <table border="1" align="center">
+        <tr>
+            <th>ID</th>
+            <th>Nama</th>
+            <th>Alamat</th>
+            <th>Gender</th>
+            <th>Gaji</th>
+            <th>Aksi</th>
+        </tr>
+<?php foreach($employe as $row): ?>
+        <tr>
+            <td><?= $row['id'];?></td>
+            <td><?= $row['nama'];?></td>
+            <td><?= $row['alamat'];?></td>
+            <td><?= $row['gender'];?></td>
+            <td><?= $row['gaji'];?></td>
+            <td>
+               <a href="/employe/<?= $row['id'];?>/edit">edit</a>  | 
+
+               <!-- link untuk hapus data -->
+               <a href="/employe/<?= $row['id'];?>/delete" onclick="return confirm('Apakah Yakin?')">delete</a> 
+
+
+            </td>
+        </tr>
+<?php endforeach;?>
+    </table>
+</div> 
+<?= $this->endSection(); ?>
+```
+
+Coba buka `http://localhost:8080/employe` dan lakukan klik delete pada salah satu data.
+
+Untuk fungsi singkat seperti sebelumnya. Silahkan sesuaikan untuk Model **EmployeModel.php** menjadi dibawah ini
+
+```php
+<?php
+
+namespace App\Models;
+
+use CodeIgniter\Model;
+
+class EmployeModel extends Model {
+
+    protected $db;
+
+    protected $table='employes';
+
+    protected $primaryKey = 'id';
+
+    protected $allowedFields = ['id', 'nama', 'alamat', 'gender', 'gaji'];
+}
+```
+
+Kemudian sesuaikan untuk controllernya **Employe.php** ubah kode `$this->employeModel->hapus(['id' => $id]);` menjadi `$this->employeModel->delete($id);` seperti dibawah ini
+
+```php
+public function destroy($id) {
+    // hapus data berdasarkan id
+    $this->employeModel->delete($id);
+    //kembali ke table employe
+    return redirect()->to('/employe');
+}
+```
+
+Coba buka kembali `http://localhost:8080/employe` dan lakukan klik delete pada salah satu data dan amatilah.
 
 ## Referensi
 ---
@@ -1469,4 +1609,5 @@ Coba buka kembali `http://localhost:8080/employe` dan lakukan perubahan data did
 - [https://rudyekoprasetya.wordpress.com/2020/04/02/belajar-framework-code-igniter/](https://rudyekoprasetya.wordpress.com/2020/04/02/belajar-framework-code-igniter/)
 - [https://en.wikipedia.org/wiki/Rasmus_Lerdorf](https://en.wikipedia.org/wiki/Rasmus_Lerdorf)
 - [https://www.warungbelajar.com/penanganan-form-dan-form-validasi-di-codeigniter-4.html](https://www.warungbelajar.com/penanganan-form-dan-form-validasi-di-codeigniter-4.html)
--[https://www.warungbelajar.com/cara-menggunakan-query-builder-di-codeigniter.html](https://www.warungbelajar.com/cara-menggunakan-query-builder-di-codeigniter.html)
+- [https://www.warungbelajar.com/cara-menggunakan-query-builder-di-codeigniter.html](https://www.warungbelajar.com/cara-menggunakan-query-builder-di-codeigniter.html)
+- [https://stackoverflow.com/questions/8054165/using-put-method-in-html-form](https://stackoverflow.com/questions/8054165/using-put-method-in-html-form)

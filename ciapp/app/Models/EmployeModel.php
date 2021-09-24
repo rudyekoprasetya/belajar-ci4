@@ -50,4 +50,11 @@ class EmployeModel extends Model {
     //     //update employe set field1, field2 WHERE id='$id'
     //     $builder->update($key,$data);
     // }
+
+    // public function hapus($key) {
+    //     $builder=$this->db->table($this->table);
+    //     //hapus data sesuai id
+    //     //DELETE FROM employe WHERE id='$id'
+    //     $builder->delete($key);
+    // }
 }

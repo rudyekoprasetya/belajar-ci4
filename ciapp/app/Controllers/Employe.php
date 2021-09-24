@@ -65,4 +65,12 @@ class Employe extends BaseController {
         //kembali ke table employe
         return redirect()->to('/employe');
     }
+
+    public function destroy($id) {
+        // hapus data berdasarkan id
+        // $this->employeModel->hapus(['id' => $id]);
+        $this->employeModel->delete($id);
+        //kembali ke table employe
+        return redirect()->to('/employe');
+    }
 }

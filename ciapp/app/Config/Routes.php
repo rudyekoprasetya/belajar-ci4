@@ -52,6 +52,9 @@ $routes->post('/employe/save', 'Employe::save');
 //untuk edit dan ubah
 $routes->get('/employe/(:any)/edit', 'Employe::edit/$1');
 $routes->put('/employe', 'Employe::update');
+//untuk hapus data
+$routes->get('/employe/(:any)/delete', 'Employe::destroy/$1');
+
 
 
 
