@@ -24,8 +24,8 @@ Modul ini menggunakan lisensi [Creative Common](https://creativecommons.org/lice
 - [Membuat CRUD Simpan Data](#membuat-crud-simpan-data)
 - [Membuat CRUD Edit Data](#membuat-crud-edit-data)
 - [Membuat CRUD Hapus Data](#membuat-crud-hapus-data)
-- Tentang Migration dan Seeding
-- Membuat Autentifikasi
+- [Tentang Migration dan Seeding](#tentang-migration-dan-seeding)
+- [Membuat Autentifikasi](#membuat-autentifikasi)
 - Membuat Restfull API
 - [Referensi](#referensi)
 
@@ -1601,6 +1601,237 @@ public function destroy($id) {
 
 Coba buka kembali `http://localhost:8080/employe` dan lakukan klik delete pada salah satu data dan amatilah.
 
+## Tentang Migration dan Seeding
+---
+
+**Migration** adalah cara mudah untuk mengubah, memanipulasi database secara terstruktur dan terorganisir. Dimana kita dapat mengedit fragmen SQL, secara konsisten untuk memberi tahu developer lain saat bekerja dengan team tentang segala macam perubahan schema database project kita.
+
+Disini kita akan membuat table **division** untuk mencatat data bagian atau divisi dari employe untuk project kita dengan migration. Silahkan buka console atau terminal di project ci anda kemudian ketikan perintah
+
+```console
+php spark make:migration add_table_division
+```
+Maka secara otomatis akan dibuatkan file **2021-10-17-021721_AddTableDivision.php** di folder **app/Database/Migrations**. 
+
+Buka file tersebut dan kita lakukan penyesuaian
+
+```php
+<?php
+
+namespace App\Database\Migrations;
+
+use CodeIgniter\Database\Migration;
+
+class AddTableDivision extends Migration
+{
+    public function up()
+    {
+        //membuat field di table division
+        $this->forge->addField([
+            'div_id' => [
+                'type' => 'INT',
+                'constraint' => 5,
+                'unsigned' => true,
+                'auto_increment' => true
+            ],
+            'division' => [
+                'type' => 'VARCHAR',
+                'constraint' => 60
+            ],
+            'is_aktif' => [
+                'type' => 'ENUM',
+                'constraint' => ['yes','no'],
+                'default' => 'yes' 
+            ],
+            'created_at' => [
+                'type' => 'TIMESTAMP'
+            ],
+            'updated_at' => [
+                'type' => 'TIMESTAMP'
+            ],
+        ]);
+
+        $this->forge->addKey('div_id',true);
+        $this->forge->createTable('divisions');
+    }
+
+    public function down()
+    {
+        //drop table
+        $this->forge->dropTable('divisions');
+    }
+}
+```
+Pada file migration diatas saya membuat field div_id sebagai primary key, field division dengan type varchar(100) untuk mencatat divisi dari employe dan field is_aktif untuk mengetahui apakah divisi tersebut aktif atau tidak. Jangan lupa kita tambahkan field created_at dan updated_at dengan tipe timestamp untuk log data.
+
+Selanjutnya jalankan perintah berikut
+
+```console
+php spark migrate:refresh
+```
+
+Maka secara otomatis pada database anda akan muncul table baru yaitu, *division, users, artifcles dan migrations*.
+
+secara default ci4 sudah memiliki file migration untuk table users dan articles, sedangkan fungsi dari table migration adalah untuk mencatat history atau apa saja perubahan dalam skema database project kita.
+
+Semisal kita akan buat file migration untuk table employes yang sudah kita buat CRUD sebelumnya. Namun sebelum itu silahkan drop atau hapus terlebih dahulu table employes agar proses migration tidak error.
+
+kemudian kita buat file migrationnya dengan perintah
+
+```console
+php spark make:migration add_table_employes
+```
+
+kemudian kita edit file migration **2021-10-17-033914_AddTableEmployes.php** untuk memberikan field-field yang dibutukan 
+
+```php
+<?php
+
+namespace App\Database\Migrations;
+
+use CodeIgniter\Database\Migration;
+
+class AddTableEmployes extends Migration
+{
+    public function up()
+    {
+        $this->forge->addField([
+            'id' => [
+                'type' => 'INT',
+                'constraint' => 4,
+                'unsigned' => true,
+                'auto_increment' => true
+            ],
+            'nama' => [
+                'type' => 'VARCHAR',
+                'constraint' => 30
+            ],
+            'alamat' => [
+                'type' => 'TEXT',
+                'default' => null 
+            ],
+            'gender' => [
+                'type' => 'ENUM',
+                'constraint' => ['L','P']
+            ],
+            'gaji' => [
+                'type' => 'INT',
+                'constraint' => 10
+            ],
+            'created_at' => [
+                'type' => 'TIMESTAMP'
+            ],
+            'updated_at' => [
+                'type' => 'TIMESTAMP'
+            ],
+        ]);
+
+        $this->forge->addKey('id',true);
+        $this->forge->createTable('employes');
+    }
+
+    public function down()
+    {
+        $this->forge->dropTable('employes');
+    }
+}
+```
+Jangan lupa setiap ingin melakukan migrate harus menjalankan perintah
+
+```console
+php spark migrate:refresh
+```
+
+**Perlu diperhatikan** bahwa setelah melakukan migrate, maka kondisi data dalam table akan kosong kembali. karena proses migrate tersebut adalah membuat ulang skema database kita. Akan sangat merepotkan jika kita melakukan input data satu per satu hanya untuk melakukan testing.
+
+Untuk itu kita bisa menggunakan *Seeding*. **Seeding** adalah cara sederhana untuk menambahkan data ke dalam database. Ini sangat berguna selama proses development di mana kita hanya perlu mengisi database dengan data sampel dan di *generate* secara otomatis.
+
+Sebelum itu kita install library [faker](https://fakerphp.github.io/) dengan composer pada project kita. 
+
+Buka terminal,pada file project kita ketikan perintah
+
+```console
+composer require --dev fakerphp/faker
+```
+tunggu sampai proses installasi selesai
+
+Selanjutnya kita buat seeder untuk table employe agar datanya langsung terisi. 
+
+Jalankan perintah dibawah ini pada console atau terminal
+
+```console
+php spark make:seeder EmployeSeeder
+```
+
+Kemudian kita buka file seeder **EmployeSeeder.php** yang ada pada folder **app/Database/Seeds**
+
+```php
+<?php
+
+namespace App\Database\Seeds;
+
+use CodeIgniter\Database\Seeder;
+
+class EmployeSeeder extends Seeder
+{
+    public function run()
+    {
+        //setting faker untuk data dari indonesia
+        $faker = \Faker\Factory::create('id_ID');
+
+        //buat 10 data
+        for($i =0; $i < 10; $i++) {
+            $data = [
+                //generate nama  
+                'nama' => $faker->name,
+                //generate alamat
+                'alamat' => $faker->address,
+                //generate gender untuk L atau P
+                'gender' => $faker->randomElement(['L','P']),
+                //generate gaji 100.000, 200.000 dan 80.000
+                'gaji' => $faker->randomElement([100000,200000,80000])
+            ];
+            //memasukan data ke database
+            $this->db->table('employes')->insert($data);
+        }
+        
+    }
+}
+```
+Pada coding diatas kita buat variabel `$faker` yang digunakan sebagai object dari class Factory dengan method static create, pada method static crate kita gunakan parameter **id_ID** agar dummy data kita nanti berisi informasi data dari Indonesia.
+
+ita gunakan perintah perulangan for agar melalui perulangan sebanyak 10 kali untuk 10 data. perintah `randomElement` agar melakukan random string, untuk mendapatkan gender dan gaji.
+
+Semua data di masukan dalam array, dimana masing – masing kolom disesuaikan nilainya dengan method di library faker.
+
+Kemudian dimasukan dalam database dengan code $this->db->table('employes')->insert($data);`
+
+Simpan dan kemudian jalankan perintah
+
+```console
+php spark db:seed EmployeSeeder
+```
+
+Coba buka `http://localhost/phpmyadmin` cek pada table employes, amatilah datanya. Selain itu coba buka CRUD employe yang sudah kita buat sebelumnya.
+
+### latihan
+
+1. Buatlah table Admin pada project anda dengan menggunakan Migration dengan ketentuan field-field sebagai berikut ini
+    - id_admin sebagai primary key nomor urut
+    - username berisi email untuk login
+    - password berisi password untuk login
+    - created_at timestamp 
+    - updated_at timestamp
+2. Isilah data tabel admin tersebut dengan menggunakan Seeding min 5 data.
+
+
+## Membuat Autentifikasi
+---
+
+
+
+
+
 ## Referensi
 ---
 
@@ -1611,3 +1842,4 @@ Coba buka kembali `http://localhost:8080/employe` dan lakukan klik delete pada s
 - [https://www.warungbelajar.com/penanganan-form-dan-form-validasi-di-codeigniter-4.html](https://www.warungbelajar.com/penanganan-form-dan-form-validasi-di-codeigniter-4.html)
 - [https://www.warungbelajar.com/cara-menggunakan-query-builder-di-codeigniter.html](https://www.warungbelajar.com/cara-menggunakan-query-builder-di-codeigniter.html)
 - [https://stackoverflow.com/questions/8054165/using-put-method-in-html-form](https://stackoverflow.com/questions/8054165/using-put-method-in-html-form)
+- [https://www.warungbelajar.com/tutorial-codeigniter-4-part-8-mengenal-fitur-migration-seeding-dan-library-faker-di-codeigniter-4.html](https://www.warungbelajar.com/tutorial-codeigniter-4-part-8-mengenal-fitur-migration-seeding-dan-library-faker-di-codeigniter-4.html)
