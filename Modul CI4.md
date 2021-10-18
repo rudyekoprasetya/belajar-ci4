@@ -1828,7 +1828,228 @@ Coba buka `http://localhost/phpmyadmin` cek pada table employes, amatilah datany
 ## Membuat Autentifikasi
 ---
 
+*Authentication (autentifikasi) dan Authorization (otorisasi)* merupakan dua hal yang sangat dekat dan sering kali tertukar. Jika sebelumnya kita sudah tahu bahwa **autentikasi** adalah proses untuk memvalidasi keautentikan atau keaslian dari identitas pengguna. Nah, **Otorisasi** adalah proses pengecekan apakah pengguna autentik berhak mengakses resource yang diminta.
 
+Mudahnya bila digambarkan pada sistem aplikasi, otorisasi memeriksa wewenang dari pengguna dalam menentukan fitur apa saja yang dapat diakses. Contohnya, bila pengguna terautentikasi sebagai staf marketing, fitur yang ditampilkan hanya laporan penjualan, kontak client, dan fitur terkait marketing lainnya. Beda cerita jika pengguna terautentikasi sebagai staf admin, seluruh fitur yang ada di dalam sistem akan terbuka.
+
+Agar lebih paham kali ini kita akan membuat fitur register untuk admin beserta login dan logoutnya (Autentifikasi). Dimana fitur tersebut digunakan untuk melindungi fitur CRUD employe agar bisa diakses oleh yang berhak (Otorisasi) atau admin yang terdaftar saja.
+
+Pertama kita buat model **AdminModel.php** dengan perintah
+
+```console
+php spark make:model AdminModel
+```
+
+Kita sesuaikan coding di AdminModel.php sebagai berikut
+
+```php
+<?php
+
+namespace App\Models;
+
+use CodeIgniter\Model;
+
+class AdminModel extends Model
+{
+    protected $DBGroup              = 'default';
+    protected $table                = 'admins';
+    protected $primaryKey           = 'id_admin';
+    protected $useAutoIncrement     = true;
+    protected $insertID             = 0;
+    protected $returnType           = 'array';
+    protected $protectFields        = true;
+    protected $allowedFields        = ['username','password'];
+
+    // Dates
+    protected $useTimestamps        = true;
+    protected $dateFormat           = 'datetime';
+    protected $createdField         = 'created_at';
+    protected $updatedField         = 'updated_at';
+
+}
+
+```
+
+Kemudian kita buat controller **Admin.php** dengan perintah
+
+```console
+php spark make:controller Admin
+```
+Selanjutnya kita buat function untuk fitur register dan tampilan login pada controller **Admin.php**
+
+```php
+<?php
+
+namespace App\Controllers;
+
+use App\Controllers\BaseController;
+
+class Admin extends BaseController {
+    protected $adminModel;
+
+    public function __construct() {
+        // load model admin
+        $this->adminModel=new \App\Models\AdminModel();
+    }
+
+    public function index() {
+        $data['judul']='Register Admin Employe'; 
+        //tampilkan laman register
+        return view('register',$data);        
+    }
+
+    public function register() {
+        //ambil data dari form
+        $data=[
+            'username' => $this->request->getPost('username'),
+            //enkripsi password dengan BCRYPT
+            'password' => password_hash($this->request->getPost('password'), PASSWORD_BCRYPT)
+        ];
+        //memasukan data dalam database
+        $this->adminModel->insert($data);
+
+        //jika berhasil arahkan ke tampilan login
+        return redirect()->to('/login');
+    }
+
+    public function login() {
+        $data['judul']='Login Admin Employe'; 
+        //tampilkan laman login
+        return view('login',$data); 
+    }
+}
+```
+
+Kemudian kita buat view **register.php**
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= $judul;  ?></title>
+    <style>
+        body {
+            font: 15px Arial, sans-serif;
+            background-color: lightgrey;
+        }
+        .form-login {
+            height: 15rem;
+            width: 40%;
+            border: 2px solid navy;
+            margin: 2rem auto;
+            box-shadow: 5px 7px blue;
+            background-color: white;
+        }
+
+        button {
+            height: 2rem;
+            width: 4rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-login">
+    <h2 align="center"><?= $judul;  ?></h2>
+    <form action="/daftar" method="post">
+        <table border="0" align="center">
+            <tr>
+                <td>Username</td>
+                <td><input type="text" name="username"></td>
+            </tr>
+            <tr>
+                <td>Password</td>
+                <td><input type="password" name="password_new"></td>
+            </tr>
+            <tr>
+                <td>Ulangi Password</td>
+                <td><input type="password" name="password"></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <button type="submit">Register</button> 
+                    <button type="reset">Reset</button> 
+                </td>
+            </tr>
+        </table>
+    </form>
+    <p align="center"><a href="/login">Login jika sudah punya Akun</a></p>
+    </div>
+    
+</body>
+</html>
+```
+
+Kemudian kita buat view **login.php** sebagai berikut
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= $judul; ?></title>
+    <style>
+        body {
+            font: 15px Arial, sans-serif;
+            background-color: lightgrey;
+        }
+        .form-login {
+            height: 200px;
+            width: 40%;
+            border: 2px solid navy;
+            margin: 2rem auto;
+            box-shadow: 5px 7px blue;
+            background-color: white;
+        }
+
+        button {
+            height: 2rem;
+            width: 4rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-login">
+    <h2 align="center"><?= $judul; ?></h2>
+    <form action="/login/cek" method="post">
+        <table border="0" align="center">
+            <tr>
+                <td>Username</td>
+                <td><input type="text" name="username"></td>
+            </tr>
+            <tr>
+                <td>Password</td>
+                <td><input type="password" name="password"></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><button type="submit">Login</button></td>
+            </tr>
+        </table>
+    </form>
+    <p align="center"><a href="/register">Belum Punya Akun</a></p>
+    </div>
+    
+</body>
+</html>
+```
+Jangan lupa kita buat route untuk fitur tersebut, buka file **Routes.php** tambahkan route dibawah ini
+
+```php
+//untuk autentifikasi dan otorasi
+$routes->get('/register', 'Admin::index');
+$routes->post('/daftar', 'Admin::register');
+$routes->get('/login', 'Admin::login');
+```
+
+Sekarang bukalah url `http://localhost:8080/register` coba inputkan data semisal username admin passwordnya admin. Klik register amatilah yang terjadi. Jika berhasil maka akan di redirect ke laman login
+
+Untuk memastikan datanya masuk. Kita buka `http://localhost/phpmyadmun` coba kua table admins. Perhatikan data didalamnya.
 
 
 

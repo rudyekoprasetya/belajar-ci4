@@ -55,6 +55,11 @@ $routes->put('/employe', 'Employe::update');
 //untuk hapus data
 $routes->get('/employe/(:any)/delete', 'Employe::destroy/$1');
 
+//untuk autentifikasi dan otorasi
+$routes->get('/register', 'Admin::index');
+$routes->post('/daftar', 'Admin::register');
+$routes->get('/login', 'Admin::login');
+
 
 
 
