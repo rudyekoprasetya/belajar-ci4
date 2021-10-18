@@ -1851,11 +1851,9 @@ use CodeIgniter\Model;
 
 class AdminModel extends Model
 {
-    protected $DBGroup              = 'default';
     protected $table                = 'admins';
     protected $primaryKey           = 'id_admin';
     protected $useAutoIncrement     = true;
-    protected $insertID             = 0;
     protected $returnType           = 'array';
     protected $protectFields        = true;
     protected $allowedFields        = ['username','password'];
@@ -2049,8 +2047,13 @@ $routes->get('/login', 'Admin::login');
 
 Sekarang bukalah url `http://localhost:8080/register` coba inputkan data semisal username admin passwordnya admin. Klik register amatilah yang terjadi. Jika berhasil maka akan di redirect ke laman login
 
-Untuk memastikan datanya masuk. Kita buka `http://localhost/phpmyadmun` coba kua table admins. Perhatikan data didalamnya.
+Untuk memastikan datanya masuk. Kita buka `http://localhost/phpmyadmin` coba kua table admins. Perhatikan data didalamnya.
 
+Kemudian kita buat function untuk menangani autentifikasi atau fitur login. Buka controller **Admin.php** kita buat function baru seperti dibawah ini
+
+```php
+
+```
 
 
 ## Referensi

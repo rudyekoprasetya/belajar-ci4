@@ -38,5 +38,9 @@ class Admin extends BaseController {
         return view('login',$data); 
     }
 
+    public function cek_login() {
+        
+    }
+
 
 }
