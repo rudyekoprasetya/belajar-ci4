@@ -66,7 +66,21 @@ Sebelum menggunakan CI ada beberapa software yang harus di install antara lain
 4. Git [Disini untuk Panduan Git](https://rudyekoprasetya.wordpress.com/category/git/)
 5. Web Browser Rekomendasi Chrome [Download Disini](https://www.google.com/intl/id_id/chrome/)
 
-Setelah install software diatas untuk memulai menggunakan CI. Buatlah suatu folder kerja, semisal Documents/belajar-ci . CI ini tidak harus diletakkan didalam folder HTDOCS di XAMPP, apa berarti kita tidak butuh XAMPP? tetap kita butuhkannya untuk membuat aplikasi database nantinya. Silahkan aktifkan git bash atau console/terminal anda pada folder kerja tersebut. Semisal kita akan membuat project dengan nama **web-app** kemudian ketikan perintah dibawah ini
+Perlu diketahui Codeigniter 4 Membutuhkan PHP Versi 7.3 dimana CI 4 membutuhkan extension seperti *intl extension, mbstring, php-json, php-msyqld, dan php-xml* pada file **php.ini**. Secara default *extension mbstring, php-json, php-mysqld dan php-xml* sudah aktif namun terkadang untuk extension intl kita harus mengaktifkan secara manual.
+
+Untuk mengaktifkannya pastikan kita sudah menginstall PHP atau XAMPP pada sistem kita. Kemudian bukalah file php.ini biasanya ada pada folder **xampp/php/php.ini**. Lalu cari tulisan seperti ini `;extension=intl` hilangkan tanda koma didepannya seperti ini
+
+```console
+;extension=intl
+```
+menjadi
+```console
+extension=intl
+```
+
+Setelah itu restart service apache.
+
+Setelah install dan konfigurasi diatas untuk memulai menggunakan CI. Buatlah suatu folder kerja, semisal Documents/belajar-ci . CI ini tidak harus diletakkan didalam folder HTDOCS di XAMPP, apa berarti kita tidak butuh XAMPP? tetap kita butuhkannya untuk membuat aplikasi database nantinya. Silahkan aktifkan git bash atau console/terminal anda pada folder kerja tersebut. Semisal kita akan membuat project dengan nama **web-app** kemudian ketikan perintah dibawah ini
 
 ```console
 composer create-project codeigniter4/appstarter web-app --no-dev
