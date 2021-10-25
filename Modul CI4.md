@@ -1899,7 +1899,40 @@ class Admin extends BaseController {
     }
 
     public function register() {
-        //ambil data dari form
+        //untuk validasi
+        $validasi = $this->validate([
+            'username'=>[
+                //jika username sudah ada di table dan harus diisi
+                'rules' => 'required|is_unique[admins.username]',
+                'errors' => [
+                    'required' => 'Username harus diisi',
+                    'is_unique' => 'Username sudah digunakan'
+                ]
+            ],
+            'password_new' => [
+                //password harus diisi dan minimal 4 karakter
+                'rules' => 'required|min_length[4]',
+                'errors' => [
+                    'required' => 'Password harus diisi',
+                    'min_length' => 'Password minimal 4 karakter'
+                ]
+            ],
+            'password' => [
+                //password keduanya harus sama
+                'rules' => 'matches[password_new]',
+                'errors' => [
+                    'matches' => 'Konfirmasi Password tidak sama'
+                ]
+            ]
+        ]);
+
+        //jika data tidak sesuai kembali dan munculkan pesan error di form register.
+        if(!$validasi){
+            session()->setFlashdata('error', $this->validator->listErrors());
+            return redirect()->back()->withInput();
+        }
+
+        //Jika data sesuai lakukan penyimpanan data
         $data=[
             'username' => $this->request->getPost('username'),
             //enkripsi password dengan BCRYPT
@@ -1920,6 +1953,12 @@ class Admin extends BaseController {
 }
 ```
 
+coding `$this-validate()` digunakan untuk melakukan validasi form sesuai dengan aturan atau rules yang dibuat. dimana Rules yang dibuat adalah
+- **username** : Harus diisi|minimal panjang 4 karakter, username harus unique didalam kolom username di tabel admins
+- **password_new** : Harus diisi|minimal panjang 4 karakter
+- **password** : isinya harus seperti dibagian password_new
+ketika ada rules di form validation tidak sesuai, akan generate session flashdata dengan nama *error*, dengan isinya adalah daftar error dari form validasi, serta akan redirect kembali ke form **register**
+
 Kemudian kita buat view **register.php**
 
 ```html
@@ -1936,7 +1975,7 @@ Kemudian kita buat view **register.php**
             background-color: lightgrey;
         }
         .form-login {
-            height: 15rem;
+            height: 20rem;
             width: 40%;
             border: 2px solid navy;
             margin: 2rem auto;
@@ -1948,13 +1987,22 @@ Kemudian kita buat view **register.php**
             height: 2rem;
             width: 4rem;
         }
+
+        .error {
+            color: red;
+        }
     </style>
 </head>
 <body>
     <div class="form-login">
     <h2 align="center"><?= $judul;  ?></h2>
+    <?php if (!empty(session()->getFlashdata('error'))) { ?>
+    <div align="left" class="error">
+        <?= session()->getFlashdata('error'); ?>
+    </h4>
+    <?php } ?>
     <form action="/daftar" method="post">
-    <?= @csrf_field(); ?>
+    <?= csrf_field(); ?>
         <table border="0" align="center">
             <tr>
                 <td>Username</td>

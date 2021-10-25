@@ -19,20 +19,40 @@ class Admin extends BaseController {
     }
 
     public function register() {
+        //untuk validasi
         $validasi = $this->validate([
             'username'=>[
-                'rules' => 'required | is_unique[admins.username]',
+                //jika username sudah ada di table dan harus diisi
+                'rules' => 'required|is_unique[admins.username]',
                 'errors' => [
-                    'required' => '{field} harus diisi',
+                    'required' => 'Username harus diisi',
                     'is_unique' => 'Username sudah digunakan'
                 ]
             ],
+            'password_new' => [
+                //password harus diisi dan minimal 4 karakter
+                'rules' => 'required|min_length[4]',
+                'errors' => [
+                    'required' => 'Password harus diisi',
+                    'min_length' => 'Password minimal 4 karakter'
+                ]
+            ],
             'password' => [
-                'rules' => 'required | min_lenght[4]',
+                //password keduanya harus sama
+                'rules' => 'matches[password_new]',
+                'errors' => [
+                    'matches' => 'Konfirmasi Password tidak sama'
+                ]
             ]
-
         ]);
-        //ambil data dari form
+
+        //jika data tidak sesuai kembali dan munculkan pesan error.
+        if(!$validasi){
+            session()->setFlashdata('error', $this->validator->listErrors());
+            return redirect()->back()->withInput();
+        }
+
+        //Jika data sesuai lakukan penyimpanan data
         $data=[
             'username' => $this->request->getPost('username'),
             //enkripsi password dengan BCRYPT
