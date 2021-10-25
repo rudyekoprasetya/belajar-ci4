@@ -19,6 +19,22 @@ class Admin extends BaseController {
     }
 
     public function register() {
+        $validasi = $this->validate([
+            'username'=>[
+                'rules' => 'required | is_unique[admins.username]',
+                'errors' => [
+                    'required' => '{field} harus diisi',
+                    'is_unique' => 'Username sudah digunakan'
+                ]
+            ],
+            'password' => [
+                'rules' => 'required | min_lenght[4]',
+                'errors' => [
+                    'required' => 
+                ]
+            ]
+
+        ]);
         //ambil data dari form
         $data=[
             'username' => $this->request->getPost('username'),

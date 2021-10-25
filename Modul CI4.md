@@ -1954,6 +1954,7 @@ Kemudian kita buat view **register.php**
     <div class="form-login">
     <h2 align="center"><?= $judul;  ?></h2>
     <form action="/daftar" method="post">
+    <?= @csrf_field(); ?>
         <table border="0" align="center">
             <tr>
                 <td>Username</td>
