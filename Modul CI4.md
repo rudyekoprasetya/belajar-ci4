@@ -28,6 +28,7 @@ Modul ini menggunakan lisensi [Creative Common](https://creativecommons.org/lice
 - [Membuat Autentifikasi](#membuat-autentifikasi)
 - Membuat Restfull API
 - [Referensi](#referensi)
+- [Tentang Penyusun](#tentang)
 
 ## Pengantar
 ---
@@ -2293,3 +2294,15 @@ Sekarang, jika user mengakses CRUD Employe tanpa login, maka akan otomatis di ar
 - [https://stackoverflow.com/questions/8054165/using-put-method-in-html-form](https://stackoverflow.com/questions/8054165/using-put-method-in-html-form)
 - [https://www.warungbelajar.com/tutorial-codeigniter-4-part-8-mengenal-fitur-migration-seeding-dan-library-faker-di-codeigniter-4.html](https://www.warungbelajar.com/tutorial-codeigniter-4-part-8-mengenal-fitur-migration-seeding-dan-library-faker-di-codeigniter-4.html)
 - [https://www.warungbelajar.com/membuat-fitur-login-dan-register-dengan-codeigniter-4.html](https://www.warungbelajar.com/membuat-fitur-login-dan-register-dengan-codeigniter-4.html)
+
+
+## Tentang
+---
+
+![Penyusun](https://rudyekoprasetya.files.wordpress.com/2009/10/mine.jpg?w=138)
+
+Syahdan,  Seorang anak laki-laki..  lahir di Tulungagung 02 Desember 1990 tepatnya hari minggu wage, Anak pertama dan terakhir ayah ibu dan ingin sekali belajar sampai ke negara seberang.. (semoga bisa ya…). Kehidupan dimulai saat pendidikan dimulai.. ibu selalu mendidik untuk selalu berbuat baik dan jangan sampai menyakiti hati orang lain, dari TK , SD Ngadirejo 1,  dan SMP Negeri 1 di kediri jawa timur, (Bagaimana klo SMA..??) saya ndak pernah SMA,  dulu bercita-cita jadi dokter namun saya urungkan, karena kondisi ekonomi orang tua yang tidak mendukung, akhirnya saya banting setir putar haluan ke SMK, Saya Lulusan SMK Negeri 1 Kediri (kediri juga..??) . Namun Tuhan itu adil, impian untuk menjadi dokter akhirnya di wujudkan (Loohhh koq bisa..??) karena saya jadi dokter komputer, saya mengambil jurusan Teknik Komputer Jaringan. dan Alhamdulillah Lulus di Tahun 2009.
+
+setelah menuntut ilmu, saya mencoba untuk mengamalkannya… lulus dari SMK saya berkeinginnan untuk kuliah, namun tetap berhadapan dengan masalah klasik, yaitu uang, namun klo ada kemauan pasti ada jalan, alhamdulilah saya bekerja disalah satu toko komputer di kediri, dan berkat itu pula saya bisa mendaftar kuliah PTS dikediri, yaitu Universitas Nusantara PGRI. Banyak hal yang bisa dipetik dalam menghadapi kuliah dan kerja ini, khususnya dalam membagi waktu dan perasaan. Sedikit kesulitan pada Tahun Pertama Alhamdulillah bisa diatasi.
+
+Setelah belajar, Mengamalkan, kemudian ada jalan untuk menyampaikan kepada orang lain. Tepatnya September 2010 saya mengajar, meski masih anak bawang dalam dunia pendidikan namun ndak ada salahnya dicoba, karena belajar yang baik itu adalah belajar untuk menyampaikan ilmu kepada orang lain. Fokus pembelajaran dan riset saya adalah *web development (frontend dan backend), Android Development, Linux SysAdmin, AI (Artificial Intelligent) dan lagi gandrung jua dengan IoT (internet Of Things)*
