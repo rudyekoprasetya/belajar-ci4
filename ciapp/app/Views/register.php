@@ -35,7 +35,7 @@
     <?php if (!empty(session()->getFlashdata('error'))) { ?>
     <div align="left" class="error">
         <?= session()->getFlashdata('error'); ?>
-    </h4>
+    </div>
     <?php } ?>
     <form action="/daftar" method="post">
     <?= csrf_field(); ?>

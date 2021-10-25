@@ -1982,12 +1982,10 @@ Kemudian kita buat view **register.php**
             box-shadow: 5px 7px blue;
             background-color: white;
         }
-
         button {
             height: 2rem;
             width: 4rem;
         }
-
         .error {
             color: red;
         }
@@ -1999,7 +1997,7 @@ Kemudian kita buat view **register.php**
     <?php if (!empty(session()->getFlashdata('error'))) { ?>
     <div align="left" class="error">
         <?= session()->getFlashdata('error'); ?>
-    </h4>
+    </div>
     <?php } ?>
     <form action="/daftar" method="post">
     <?= csrf_field(); ?>
@@ -2048,7 +2046,7 @@ Kemudian kita buat view **login.php** sebagai berikut
             background-color: lightgrey;
         }
         .form-login {
-            height: 200px;
+            height: 220px;
             width: 40%;
             border: 2px solid navy;
             margin: 2rem auto;
@@ -2060,12 +2058,25 @@ Kemudian kita buat view **login.php** sebagai berikut
             height: 2rem;
             width: 4rem;
         }
+
+        .error {
+            color: red;
+            margin: auto;
+        }
     </style>
 </head>
 <body>
     <div class="form-login">
     <h2 align="center"><?= $judul; ?></h2>
-    <form action="/login/cek" method="post">
+
+    <?php if (!empty(session()->getFlashdata('error'))) { ?>
+    <div align="center" class="error">
+        <?= session()->getFlashdata('error'); ?>
+    </div>
+    <?php } ?>
+
+    <form action="/cek_login" method="post">
+    <?= csrf_field(); ?>
         <table border="0" align="center">
             <tr>
                 <td>Username</td>
@@ -2099,6 +2110,89 @@ $routes->get('/login', 'Admin::login');
 Sekarang bukalah url `http://localhost:8080/register` coba inputkan data semisal username admin passwordnya admin. Klik register amatilah yang terjadi. Jika berhasil maka akan di redirect ke laman login
 
 Untuk memastikan datanya masuk. Kita buka `http://localhost/phpmyadmun` coba kua table admins. Perhatikan data didalamnya.
+
+Selanjutnya kita akan buat fitur untuk menangani login. Silahkan tambahkan function dibawah ini pada controller Admin
+
+```php
+public function cek_login() {
+    //ambil data dari form
+    $username = $this->request->getPost('username');
+    $password = $this->request->getPost('password');
+
+    //cari data dari tabel admin sesuai username
+    $dataUser=$this->adminModel->where('username',$username)->first();
+
+    // jika ada
+    if($dataUser) {
+        //jika password sesuai
+        if(password_verify($password,$dataUser['password'])) {
+            //masukan session untuk username dan status login
+            session()->set([
+                'username' => $username,
+                'logged_in' =>true
+            ]);
+            //masukan ke laman crud employe
+            return redirect()->to('/employe');
+        } 
+    } else { //jika  salah
+        //kembali ke login dan berikan pesan error
+        session()->setFlashdata('error', 'Username & Password Salah');
+        return redirect()->back();
+    }
+}
+```
+Coding diatas digunakan untuk mencari apakah username dan password yang dimasukan ada dalam database. Hal ini bisa dilihat pada code `$dataUser=$this->adminModel->where('username',$username)->first();`. Kemudian jika username ditemukan langkah selanjutnya adalah verifikasi password yang telah di enkripsi dengan code `password_verify($password,$dataUser['password'])`.
+
+Jika semuanya cocok maka data username dan status login akan disimpan dalam sebuah session dalam server dengan code `session()->set()`. Untuk penjelasan sessio bisa mengacu ke [sini](https://rudyekoprasetya.wordpress.com/2020/03/22/php-dasar-9-1-penggunaan-session-untuk-login/).
+
+Disini yang disimpan dalam session adalah username dan status login user apakah **true** atau **false**.
+
+Jika login berhasil akan diarahkan ke laman CRUD Employe. Namun jika gagal maka akan kembali ke laman login disertai tampilan error.
+
+Jangan lupa kita tambahkan route baru pada file **Routes.php** untuk fitur login
+
+```php
+$routes->post('/cek_login', 'Admin::cek_login');
+```
+
+Cobalah untuk melakukan login dengan akses yang sudah didaftar kan sebelumnya kemudian amatilah hasilnya jika kita coba memasukan akses yang salah.
+
+Ada login pasti ada logout. Untuk membuatnya tambahkan function berikut ini pada controller **Admin.php**
+
+```php
+public function logout() {
+    //hapus session
+    session()->destroy();
+    return redirect()->to('/login');
+}
+```
+
+pada funcfion diatas code `session()->destroy();` digunakan untuk menghapus semua data session. Setelah itu diarahkan kembali ke laman login.
+
+Untuk Link logout silahkan buka file view template kita pada **sidebar.php** tambahkan link logout seperti dibawah ini
+
+```html
+<div class="sidebar"> 
+    <ul class="nav"> 
+        <li><a href="/dashboard">Home</a></li> 
+        <li><a href="/dashboard/gallery">Gallery</a></li> 
+        <li><a href="/dashboard/about">About</a></li> 
+        <li><a href="/employe">Employe</a></li> 
+        <!-- untuk logout -->
+        <li><a href="/logout">Logout</a></li> 
+        <!-- untuk logout -->
+    </ul> 
+</div>
+```
+
+Jangan lupa tambahkan route nya pada file **Routes.php**
+
+```php
+$routes->get('/logout', 'Admin::logout');
+```
+
+Cobalah untuk klik link logout dan amatilah hasilnya.
+
 
 
 

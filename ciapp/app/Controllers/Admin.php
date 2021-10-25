@@ -71,6 +71,39 @@ class Admin extends BaseController {
         return view('login',$data); 
     }
 
+    public function cek_login() {
+        //ambil data dari form
+        $username = $this->request->getPost('username');
+        $password = $this->request->getPost('password');
+
+        //cari data dari tabel admin sesuai username
+        $dataUser=$this->adminModel->where('username',$username)->first();
+
+        // dd($dataUser);
+        // jika ada
+        if($dataUser) {
+            //jika password sesuai
+            if(password_verify($password,$dataUser['password'])) {
+                //masukan session untuk username dan status login
+                session()->set([
+                    'username' => $username,
+                    'logged_in' =>true
+                ]);
+                //masukan ke laman crud employe
+                return redirect()->to('/employe');
+            } 
+        } else { //jika  salah
+            //kembali ke login dan berikan pesan error
+            session()->setFlashdata('error', 'Username & Password Salah');
+            return redirect()->back();
+        }
+    }
+
+    public function logout() {
+        //hapus session
+        session()->destroy();
+        return redirect()->to('/login');
+    }
 
 }
 

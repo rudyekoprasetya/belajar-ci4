@@ -11,7 +11,7 @@
             background-color: lightgrey;
         }
         .form-login {
-            height: 200px;
+            height: 220px;
             width: 40%;
             border: 2px solid navy;
             margin: 2rem auto;
@@ -23,12 +23,25 @@
             height: 2rem;
             width: 4rem;
         }
+
+        .error {
+            color: red;
+            margin: auto;
+        }
     </style>
 </head>
 <body>
     <div class="form-login">
     <h2 align="center"><?= $judul; ?></h2>
-    <form action="/login/cek" method="post">
+
+    <?php if (!empty(session()->getFlashdata('error'))) { ?>
+    <div align="center" class="error">
+        <?= session()->getFlashdata('error'); ?>
+    </div>
+    <?php } ?>
+
+    <form action="/cek_login" method="post">
+    <?= csrf_field(); ?>
         <table border="0" align="center">
             <tr>
                 <td>Username</td>
