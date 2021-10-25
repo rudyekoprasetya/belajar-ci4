@@ -2191,10 +2191,78 @@ Jangan lupa tambahkan route nya pada file **Routes.php**
 $routes->get('/logout', 'Admin::logout');
 ```
 
-Cobalah untuk klik link logout dan amatilah hasilnya.
+Cobalah untuk klik link **logout** pada menu dan amatilah hasilnya.
 
+Disini kita sudah selesai untuk membuat fitur **otentifikasi**. Namun coba perhatikan cobalah buka via url `http://localhost:8080/employe` *apakah data crud employe muncul???*
 
+*kalau bisa, apa gunanya kita buat fitur login dan logout???*
 
+Pada kasus ini kita belum menerapkan **otorisasi**. Dimana nanti kita set laman crud employe tersebut diakses oleh yang berhak saja atau memaksa user harus login dahulu.
+
+Disini kita akan menggunakan fitur CI 4 yaitu *Controller Filter*. **Controller Filter** digunakan untuk melakukan tindakan baik sebelum atau setelah Controller  dijalankan. Kita dapat memilih URI spesifik tempat filter akan diterapkan. Selengkapnya baca [Controller Filter](https://codeigniter4.github.io/userguide/incoming/filters.html) 
+
+Untuk itu silahkan buat file baru dengan nama **Auth.php** di folder **App/Filters/**
+
+```php
+<?php
+
+namespace App\Filters;
+
+use CodeIgniter\HTTP\RequestInterface;
+use CodeIgniter\HTTP\ResponseInterface;
+use CodeIgniter\Filters\FilterInterface;
+
+class Auth implements FilterInterface {
+    public function before(RequestInterface $request, $arguments = null) {
+        // jika user belum login
+        if(! session()->get('logged_in')){
+            // maka redirct ke halaman login
+            return redirect()->to('/login'); 
+        }
+    }
+
+    public function after(RequestInterface $request, ResponseInterface $response, $arguments = null) {
+        // Do something here
+    }
+}
+```
+
+Terdapat 2 function yaitu: `function before() dan function after()`. Pada kasus ini, kita hanya bermain di `function before()`. *Function before*, berfungsi untuk memvalidasi request sebelum request itu sendiri dilakukan. Pada filter **Auth.php** diatas, kita me-redirect users ke halaman login jika mengakses suatu halaman sebelum login.
+
+Selanjutnya kita daftarkan Filter tersebut pada file **Filters.php** di **app/Config**.  kemudian temukan kode berikut:
+
+```php
+public $aliases = [
+    'csrf'     => CSRF::class,
+    'toolbar'  => DebugToolbar::class,
+    'honeypot' => Honeypot::class,
+];
+```
+menjadi 
+
+```php
+public $aliases = [
+    'csrf'     => CSRF::class,
+    'toolbar'  => DebugToolbar::class,
+    'honeypot' => Honeypot::class,
+    'auth' => \App\Filters\Auth::class,
+];
+```
+
+Yang terakhir kita filter route pada **Routes.php** yang boleh diakses oleh admin, semisal disini route CRUD Employe seperti dibawah ini
+
+```php
+//route untuk employe
+$routes->get('/employe', 'Employe::index',['filter' => 'auth']);
+$routes->post('/employe/save', 'Employe::save',['filter' => 'auth']);
+$routes->get('/employe/(:any)/edit', 'Employe::edit/$1',['filter' => 'auth']);
+$routes->put('/employe', 'Employe::update',['filter' => 'auth']);
+$routes->get('/employe/(:any)/delete', 'Employe::destroy/$1',['filter' => 'auth']);
+```
+
+Jika Kita memiliki halaman lain yang ingin di proteksi, maka tinggal tambahkan di route dan tambahkan code `['filter' => 'auth']`, maka halaman tersebut tidak dapat diakses sebelum login tanpa harus membuat file Filter lagi.
+
+Sekarang, jika user mengakses CRUD Employe tanpa login, maka akan otomatis di arahkan ke halaman Login.
 
 ## Referensi
 ---
@@ -2207,3 +2275,4 @@ Cobalah untuk klik link logout dan amatilah hasilnya.
 - [https://www.warungbelajar.com/cara-menggunakan-query-builder-di-codeigniter.html](https://www.warungbelajar.com/cara-menggunakan-query-builder-di-codeigniter.html)
 - [https://stackoverflow.com/questions/8054165/using-put-method-in-html-form](https://stackoverflow.com/questions/8054165/using-put-method-in-html-form)
 - [https://www.warungbelajar.com/tutorial-codeigniter-4-part-8-mengenal-fitur-migration-seeding-dan-library-faker-di-codeigniter-4.html](https://www.warungbelajar.com/tutorial-codeigniter-4-part-8-mengenal-fitur-migration-seeding-dan-library-faker-di-codeigniter-4.html)
+- [https://www.warungbelajar.com/membuat-fitur-login-dan-register-dengan-codeigniter-4.html](https://www.warungbelajar.com/membuat-fitur-login-dan-register-dengan-codeigniter-4.html)

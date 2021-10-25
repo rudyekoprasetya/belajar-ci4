@@ -48,13 +48,13 @@ $routes->get('/hitung', 'Web::hitung');
 $routes->post('/hitung/proses', 'Web::proses');
 
 //route untuk employe
-$routes->get('/employe', 'Employe::index');
-$routes->post('/employe/save', 'Employe::save');
+$routes->get('/employe', 'Employe::index',['filter' => 'auth']);
+$routes->post('/employe/save', 'Employe::save',['filter' => 'auth']);
 //untuk edit dan ubah
-$routes->get('/employe/(:any)/edit', 'Employe::edit/$1');
-$routes->put('/employe', 'Employe::update');
+$routes->get('/employe/(:any)/edit', 'Employe::edit/$1',['filter' => 'auth']);
+$routes->put('/employe', 'Employe::update',['filter' => 'auth']);
 //untuk hapus data
-$routes->get('/employe/(:any)/delete', 'Employe::destroy/$1');
+$routes->get('/employe/(:any)/delete', 'Employe::destroy/$1',['filter' => 'auth']);
 
 //untuk autentifikasi dan otorasi
 $routes->get('/register', 'Admin::index');
