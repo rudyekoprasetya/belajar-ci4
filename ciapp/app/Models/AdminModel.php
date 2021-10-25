@@ -6,11 +6,9 @@ use CodeIgniter\Model;
 
 class AdminModel extends Model
 {
-    protected $DBGroup              = 'default';
     protected $table                = 'admins';
     protected $primaryKey           = 'id_admin';
     protected $useAutoIncrement     = true;
-    protected $insertID             = 0;
     protected $returnType           = 'array';
     // protected $useSoftDeletes       = false;
     protected $protectFields        = true;

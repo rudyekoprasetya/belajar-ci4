@@ -29,9 +29,6 @@ class Admin extends BaseController {
             ],
             'password' => [
                 'rules' => 'required | min_lenght[4]',
-                'errors' => [
-                    'required' => 
-                ]
             ]
 
         ]);
@@ -56,3 +53,4 @@ class Admin extends BaseController {
 
 
 }
+
