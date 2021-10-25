@@ -2238,7 +2238,7 @@ public $aliases = [
     'honeypot' => Honeypot::class,
 ];
 ```
-menjadi 
+ubah menjadi 
 
 ```php
 public $aliases = [
