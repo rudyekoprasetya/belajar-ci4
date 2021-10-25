@@ -66,6 +66,23 @@ Sebelum menggunakan CI ada beberapa software yang harus di install antara lain
 4. Git [Disini untuk Panduan Git](https://rudyekoprasetya.wordpress.com/category/git/)
 5. Web Browser Rekomendasi Chrome [Download Disini](https://www.google.com/intl/id_id/chrome/)
 
+Codeigniter 4 membutuhkan *versi php 7.3* keatas. Selain itu membutuhkan  **intl extension** dalam php kita.
+
+Jika menemui masalah yang mengatakan kita belum mengaktifkan extention intl, masalah ini ditemui saat kita menginstall dengan menggunakan composer. Buka file **php.ini**
+
+lalu cari tulisan seperti ini **extension=intl**, hilangkan tanda titik koma diawal sehingga kurang lebih seperti ini :
+
+```console
+;extention=intl
+```
+
+menjadi
+
+```console
+extention=intl
+```
+setelah itu restart service apache
+
 Setelah install software diatas untuk memulai menggunakan CI. Buatlah suatu folder kerja, semisal Documents/belajar-ci . CI ini tidak harus diletakkan didalam folder HTDOCS di XAMPP, apa berarti kita tidak butuh XAMPP? tetap kita butuhkannya untuk membuat aplikasi database nantinya. Silahkan aktifkan git bash atau console/terminal anda pada folder kerja tersebut. Semisal kita akan membuat project dengan nama **web-app** kemudian ketikan perintah dibawah ini
 
 ```console
