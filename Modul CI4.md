@@ -26,7 +26,7 @@ Modul ini menggunakan lisensi [Creative Common](https://creativecommons.org/lice
 - [Membuat CRUD Hapus Data](#membuat-crud-hapus-data)
 - [Tentang Migration dan Seeding](#tentang-migration-dan-seeding)
 - [Membuat Autentifikasi](#membuat-autentifikasi)
-- Membuat Restfull API
+- [Membuat Restful API](#membuat-restful-api)
 - [Referensi](#referensi)
 - [Tentang Penyusun](#tentang)
 
@@ -2282,6 +2282,350 @@ Jika Kita memiliki halaman lain yang ingin di proteksi, maka tinggal tambahkan d
 
 Sekarang, jika user mengakses CRUD Employe tanpa login, maka akan otomatis di arahkan ke halaman Login.
 
+## Membuat Restful API
+---
+
+Pada Kesempatan kali ini Kita akan membahas mengenai suatu teknologi yang  banyak diperbincangkan, yaitu **API (Application Programming Interface)**. 
+
+*Apasih sebenarnya API itu? Apa kegunaannya? Penting gak kita belajar mengenai API?*. 
+
+![restapi](https://restfulapi.net/wp-content/uploads/rest-arch.jpg)
+
+Singkatnya dahulu sebelum saat kita ingin membuat suatu aplikasi (Semisal aplikasi WEB) kita membuatnya dengan Bahasa Pemrograman PHP dan MySQL sebagai databasenya. Namun bila mana aplikasi kita tersebut ingin bisa diakses dengan perangkat mobile (semisal android) akan sangat tidak memungkinkan bisa menjadi satu database karena pemrograman android menggunakan Java.API ini adalah suatu bagian program yang bisa menghubungkan atau mengkomunikasi antara aplikasi yang berbeda platform.
+
+Dalam Rest API method yang sering digunakan adalah *GET, POST, PUT dan DELETE* sama halnya saat kita membuat aplikasi CRUD, semua method tersebut memiliki fungsi yang sama dengan CRUD.
+
+Untuk Praktikum disini kita akan membuat suatu REST API untuk CRUD data **articles** dimana skenario request atau end point nya adalah sebagai berikut :
+
+- **POST /articles** : untuk menyimpan data artikel
+- **GET /articles** : untuk menampilkan semua data artikel
+- **GET /articles/id**:  untuk mencari data dari artikel tertentu
+- **PUT /articles** : untuk mengubah data suatu artikel
+- **DELETE /articles/id** : untuk menghapus suatu artikel
+
+Pertama kita buat dahulu table Articles dengan migration dengan perintah
+
+```console
+php spark make:migration add_table_articles
+```
+
+Selanjutnya kita edit file migrationnya **2021-10-17-032936_AddTableArticles.php**
+
+```php
+<?php
+
+namespace App\Database\Migrations;
+
+use CodeIgniter\Database\Migration;
+
+class AddTableArticles extends Migration
+{
+    public function up()
+    {
+        $this->forge->addField([
+            'id' => [
+                'type' => 'INT',
+                'constraint' => 5,
+                'unsigned' => true,
+                'auto_increment' => true
+            ],
+            'title' => [
+                'type' => 'VARCHAR',
+                'constraint' => 60
+            ],
+            'articles' => [
+                'type' => 'TEXT',
+                'default' => null 
+            ],
+            'author' => [
+                'type' => 'VARCHAR',
+                'constraint' => 100
+            ],
+            'created_at' => [
+                'type' => 'TIMESTAMP'
+            ],
+            'updated_at' => [
+                'type' => 'TIMESTAMP'
+            ],
+        ]);
+
+        $this->forge->addKey('id',true);
+        $this->forge->createTable('articles');
+    }
+
+    public function down()
+    {
+        $this->forge->dropTable('articles');
+    }
+}
+```
+Selanjutnya kita jalankan migration
+
+```console
+php spark migrate
+```
+
+Kita buat untuk Seedernya pula dengan perintah
+
+```console
+php spark make:seeder ArticleSeeder
+```
+
+Kita edit file **ArticleSeeder.php** di **/app/Database/Seeds**
+
+```php
+<?php
+
+namespace App\Database\Seeds;
+
+use CodeIgniter\Database\Seeder;
+
+class ArticleSeeder extends Seeder
+{
+    public function run()
+    {
+        //setting faker
+        $faker = \Faker\Factory::create('id_ID');
+
+        //buat 5 data artikel
+        for($i=0;$i<5;$i++) {
+            $data = [
+                'title' => $faker->sentence,
+                'articles' => $faker->paragraph,
+                'author' => $faker->name
+            ];
+            //memasukan data ke database
+            $this->db->table('articles')->insert($data);
+        }        
+    }
+}
+```
+
+kemudian jalankan seeder dengan perintah
+
+```console
+php spark db:seed ArticleSeeder
+```
+
+Selanjutnya kita buat file Model **ArticleModel.php** 
+
+```console
+php spark make:model ArticleModel
+```
+
+Selanjutnya kita sesuai untuk file Model ArticleModel sebagai berikut
+
+```php
+<?php
+
+namespace App\Models;
+
+use CodeIgniter\Model;
+
+class ArticleModel extends Model
+{
+    protected $DBGroup              = 'default';
+    protected $table                = 'articles';
+    protected $primaryKey           = 'id';
+    protected $useAutoIncrement     = true;
+    protected $insertID             = 0;
+    protected $returnType           = 'array';
+    protected $useSoftDeletes       = false;
+    protected $protectFields        = true;
+    protected $allowedFields        = ['title','articles','author'];
+
+    // Dates
+    protected $useTimestamps        = true;
+    protected $dateFormat           = 'datetime';
+    protected $createdField         = 'created_at';
+    protected $updatedField         = 'updated_at';
+}
+```
+
+Selanjutnya buat controller untuk restful api dengan
+
+```console
+php spark make:controller Article --restful
+```
+
+Kita edit file controllernya seperti dibawah ini
+
+```php
+<?php
+
+namespace App\Controllers;
+
+use CodeIgniter\RESTful\ResourceController;
+
+class Article extends ResourceController
+{    
+    protected $articleModel;
+    public function __construct() {
+        //load model
+        $this->articleModel=new \App\Models\ArticleModel();
+    }
+    /**
+     * Return an array of resource objects, themselves in array format
+     *
+     * @return mixed
+     */
+    public function index()
+    {
+        //tampilkan semua data
+        $data=$this->articleModel->findAll();
+        return $this->respond($data);
+    }
+
+    /**
+     * Return the properties of a resource object
+     *
+     * @return mixed
+     */
+    public function show($id = null)
+    {
+        //tampilkan data dengan id tertentu
+        $data=$this->articleModel->where('id',$id)->first();
+        
+        //jika data ketemu
+        if($data) {
+            return $this->respond($data);
+        } else {
+            //jika data tidak ditemukan
+            return $this->failNotFound('data tidak ditemukan');
+        }
+        
+    }
+
+    /**
+     * Return a new resource object, with default properties
+     *
+     * @return mixed
+     */
+    public function new()
+    {
+        //
+    }
+
+    /**
+     * Create a new resource object, from "posted" parameters
+     *
+     * @return mixed
+     */
+    public function create()
+    {
+        //untuk tambah data
+        $data = [
+            'title' =>$this->request->getVar('title'),
+            'articles' =>$this->request->getVar('articles'),
+            'author' =>$this->request->getVar('author')
+        ];
+
+        //masukan dalam database
+        $this->articleModel->insert($data);
+
+        //untuk respon
+        return $this->respondCreated($data, 'Data berhasil disimpan');
+
+    }
+
+    /**
+     * Return the editable properties of a resource object
+     *
+     * @return mixed
+     */
+    public function edit($id = null)
+    {
+        //
+    }
+
+    /**
+     * Add or update a model resource, from "posted" properties
+     *
+     * @return mixed
+     */
+    public function update($id = null)
+    {
+        //ambil data
+        $data=[
+            'title' =>$this->request->getVar('title'),
+            'articles' =>$this->request->getVar('articles'),
+            'author' =>$this->request->getVar('author')
+        ];
+
+        //ubah data
+        $this->articleModel->update($id,$data);
+
+        //respon 
+        return $this->respondUpdated($data,'Data berhasil diubah');
+    }
+
+    /**
+     * Delete the designated resource object from the model
+     *
+     * @return mixed
+     */
+    public function delete($id = null)
+    {
+        //cari data berdasarkan id
+        $cari=$this->articleModel->find($id);
+        
+        //jika ada hapus data
+        if($cari) {
+            $this->articleModel->delete($id);
+            return $this->respondDeleted(['id'=>$id.' Data Berhasil dihapus']);
+        } else {
+            return $this->failNotFound('data tidak ditemukan');
+        }
+    }
+}
+```
+
+untuk penjelasan masing-masing fungsi adalah sebagai berikut
+- **function index()**- digunakan untuk menampilkan semua data atau `GET /article/`
+- **function show()** - digunakan untuk menampilkan salah satu data dengan id tertentu atau `GET /article/:id`
+- **function create()** - digunakan untuk menyimpan data baru atau `POST /article/`
+- **function update()** - digunakan untuk mengubah data dengan id tertentu atau `PUT /article/:id`
+- **function delete()** - digunakan untuk menghpusa data atau `DELETE /article/:id`
+
+untuk ujicoba silahkan buka aplikasi postman. 
+
+Jalankan request dibawah untuk menampilkan semua data
+
+```console
+GET http://localhost:8080/article
+```
+
+Untuk menyimpan data jalankan request ini disertai dengan data artikel pada body
+
+```console
+POST http://localhost:8080/article
+```
+
+untuk mencari data semisal data id 1 jalakan request berikut
+
+```console
+GET http://localhost:8080/article/1
+```
+
+Selanjutnya untuk mengubah data jalankan request berikut ini disertai dengan datanya, semisal kita ubah article id 1
+
+```console
+PUT http://localhost:8080/article/1
+```
+
+Untuk hapus data semisal data untuk artikel id 1 jalankan 
+
+```console
+DELETE http://localhost:8080/article/1
+```
+
+Sampai sini kita sudah bisa membuat sebaut restful api dengan codeigniter 4.
+
+### latihan
+
+1. buatlah restful api untuk CRUD table employe
+2. buatlah resful api untuk aksi login table admin
+
 ## Referensi
 ---
 
@@ -2294,7 +2638,9 @@ Sekarang, jika user mengakses CRUD Employe tanpa login, maka akan otomatis di ar
 - [https://stackoverflow.com/questions/8054165/using-put-method-in-html-form](https://stackoverflow.com/questions/8054165/using-put-method-in-html-form)
 - [https://www.warungbelajar.com/tutorial-codeigniter-4-part-8-mengenal-fitur-migration-seeding-dan-library-faker-di-codeigniter-4.html](https://www.warungbelajar.com/tutorial-codeigniter-4-part-8-mengenal-fitur-migration-seeding-dan-library-faker-di-codeigniter-4.html)
 - [https://www.warungbelajar.com/membuat-fitur-login-dan-register-dengan-codeigniter-4.html](https://www.warungbelajar.com/membuat-fitur-login-dan-register-dengan-codeigniter-4.html)
-
+- [https://restfulapi.net](https://restfulapi.net)
+- [https://www.initekno.com/tutorial-codeigniter-4-bahasa-indonesia-membuat-restful-api/](https://www.initekno.com/tutorial-codeigniter-4-bahasa-indonesia-membuat-restful-api/)
+- [https://mfikri.com/artikel/restful-api-codeigniter4](https://mfikri.com/artikel/restful-api-codeigniter4)
 
 ## Tentang
 ---

@@ -63,6 +63,9 @@ $routes->get('/login', 'Admin::login');
 $routes->post('/cek_login', 'Admin::cek_login');
 $routes->get('/logout', 'Admin::logout');
 
+//untuk restful api
+$routes->resource('article');
+
 
 
 
