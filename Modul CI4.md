@@ -66,6 +66,8 @@ Sebelum menggunakan CI ada beberapa software yang harus di install antara lain
 3. Composer [Disini untuk Panduan Composer](https://rudyekoprasetya.wordpress.com/2021/01/01/berkenalan-dengan-composer/)
 4. Git [Disini untuk Panduan Git](https://rudyekoprasetya.wordpress.com/category/git/)
 5. Web Browser Rekomendasi Chrome [Download Disini](https://www.google.com/intl/id_id/chrome/)
+6. POSTMAN rest client [Download disini](https://www.postman.com/downloads/)
+
 
 Codeigniter 4 membutuhkan *versi php 7.3* keatas. Selain itu membutuhkan  **intl extension** dalam php kita.
 
@@ -2546,10 +2548,11 @@ class Article extends ResourceController
     public function update($id = null)
     {
         //ambil data
+        $input=$this->request->getRawInput();
         $data=[
-            'title' =>$this->request->getVar('title'),
-            'articles' =>$this->request->getVar('articles'),
-            'author' =>$this->request->getVar('author')
+            'title' => $input['title'],
+            'articles' => $input['articles'],
+            'author' => $input['author']
         ];
 
         //ubah data

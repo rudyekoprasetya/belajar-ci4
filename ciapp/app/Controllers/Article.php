@@ -93,10 +93,11 @@ class Article extends ResourceController
     public function update($id = null)
     {
         //ambil data
+        $input=$this->request->getRawInput();
         $data=[
-            'title' =>$this->request->getVar('title'),
-            'articles' =>$this->request->getVar('articles'),
-            'author' =>$this->request->getVar('author')
+            'title' => $input['title'],
+            'articles' => $input['articles'],
+            'author' => $input['author']
         ];
 
         //ubah data
