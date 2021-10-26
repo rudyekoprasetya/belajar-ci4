@@ -2590,9 +2590,24 @@ untuk penjelasan masing-masing fungsi adalah sebagai berikut
 - **function update()** - digunakan untuk mengubah data dengan id tertentu atau `PUT /article/:id`
 - **function delete()** - digunakan untuk menghpusa data atau `DELETE /article/:id`
 
-untuk ujicoba silahkan buka aplikasi postman. 
+Jangan lupa berikan Routes untuk rest api pada file **Routes.php** seperti dibawah ini
 
-Jalankan request dibawah untuk menampilkan semua data
+```php
+//untuk restful api
+$routes->resource('article');
+```
+
+Cukup dengan satu route resurce diatas, maka semua request GET, POST, PUT dan DELETE akan dibuat.
+
+untuk cek bisa ketikan perintah
+
+```console
+php spark routes
+```
+
+amatilah table route dari project codeigniter yang sudah kita buat.
+
+untuk ujicoba silahkan buka aplikasi postman. Jalankan request dibawah untuk menampilkan semua data
 
 ```console
 GET http://localhost:8080/article
