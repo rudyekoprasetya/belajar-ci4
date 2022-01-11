@@ -1585,6 +1585,13 @@ Kemudian kita sesuaikan untuk file view **tampil_data.php**
 <?= $this->endSection(); ?>
 ```
 
+Jangan lupa tambahkan route nya di File **Routes.php**
+
+```php
+//untuk hapus data
+$routes->get('/employe/(:any)/delete', 'Employe::destroy/$1');
+```
+
 Coba buka `http://localhost:8080/employe` dan lakukan klik delete pada salah satu data.
 
 Untuk fungsi singkat seperti sebelumnya. Silahkan sesuaikan untuk Model **EmployeModel.php** menjadi dibawah ini
@@ -1667,7 +1674,7 @@ class AddTableDivision extends Migration
                 'type' => 'TIMESTAMP'
             ],
             'updated_at' => [
-                'type' => 'TIMESTAMP'
+                'type' => 'DATETIME'
             ],
         ]);
 
@@ -1742,7 +1749,7 @@ class AddTableEmployes extends Migration
                 'type' => 'TIMESTAMP'
             ],
             'updated_at' => [
-                'type' => 'TIMESTAMP'
+                'type' => 'DATETIME'
             ],
         ]);
 
@@ -1824,7 +1831,7 @@ ita gunakan perintah perulangan for agar melalui perulangan sebanyak 10 kali unt
 
 Semua data di masukan dalam array, dimana masing – masing kolom disesuaikan nilainya dengan method di library faker.
 
-Kemudian dimasukan dalam database dengan code $this->db->table('employes')->insert($data);`
+Kemudian dimasukan dalam database dengan code `$this->db->table('employes')->insert($data);`
 
 Simpan dan kemudian jalankan perintah
 
@@ -1841,7 +1848,7 @@ Coba buka `http://localhost/phpmyadmin` cek pada table employes, amatilah datany
     - username berisi email untuk login
     - password berisi password untuk login
     - created_at timestamp 
-    - updated_at timestamp
+    - updated_at datetime
 2. Isilah data tabel admin tersebut dengan menggunakan Seeding min 5 data.
 
 

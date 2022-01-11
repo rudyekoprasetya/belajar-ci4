@@ -35,7 +35,7 @@ $routes->setAutoRoute(true);
 $routes->get('/', 'Admin::login');
 
 //membuat route function komentar pada controller web
-$routes->get('/komentar', 'Web::komentar');
+$routes->get('/komen', 'Web::komentar');
 
 //membuat route untuk function nama lengkap dengan uri parameter
 $routes->get('/nama/(:any)/(:num)', 'Web::nama/$1/$2');
@@ -48,13 +48,20 @@ $routes->get('/hitung', 'Web::hitung');
 $routes->post('/hitung/proses', 'Web::proses');
 
 //route untuk employe
-$routes->get('/employe', 'Employe::index',['filter' => 'auth']);
-$routes->post('/employe/save', 'Employe::save',['filter' => 'auth']);
+$routes->get('/employe', 'Employe::index');
+$routes->post('/employe/save', 'Employe::save');
 //untuk edit dan ubah
-$routes->get('/employe/(:any)/edit', 'Employe::edit/$1',['filter' => 'auth']);
-$routes->put('/employe', 'Employe::update',['filter' => 'auth']);
+$routes->get('/employe/(:any)/edit', 'Employe::edit/$1');
+$routes->put('/employe', 'Employe::update');
 //untuk hapus data
-$routes->get('/employe/(:any)/delete', 'Employe::destroy/$1',['filter' => 'auth']);
+$routes->get('/employe/(:any)/delete', 'Employe::destroy/$1');
+
+//route untuk admin
+$routes->get('/tampiladmin', 'Admin::tampil');
+$routes->post('/admin/save', 'Admin::save');
+$routes->get('/admin/(:any)/edit', 'Admin::edit/$1');
+$routes->put('/admin', 'Admin::update');
+$routes->get('/admin/(:any)/delete', 'Admin::destroy/$1');
 
 //untuk autentifikasi dan otorasi
 $routes->get('/register', 'Admin::index');

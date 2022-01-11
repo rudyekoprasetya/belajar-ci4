@@ -1,0 +1,23 @@
+body {
+	background-image: url('img/background.jpeg');
+}
+
+h1 {
+	color: red;
+	font-weight: bold;
+}
+
+input {
+	width: 10rem;
+	height: 3rem;
+	font-size: 3rem;
+	color: salmon;
+	border-radius: 15px;
+}
+
+button {
+	width: 8rem;
+	height: 3rem;
+	border-radius: 10px;
+	background-color: lightblue;
+}
