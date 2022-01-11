@@ -2354,7 +2354,7 @@ class AddTableArticles extends Migration
                 'type' => 'TIMESTAMP'
             ],
             'updated_at' => [
-                'type' => 'TIMESTAMP'
+                'type' => 'DATETIME'
             ],
         ]);
 
