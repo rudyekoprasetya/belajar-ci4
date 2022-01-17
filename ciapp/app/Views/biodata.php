@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html>
-<head> 
-    <meta charset="utf-8"> 
-    <title>Profile</title>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Codeigniter 4</title>
 </head>
-<body bgcolor="salmon"> 
-    <h1 align="center">Ini adalah view dari CI</h1> 
-    <h2 align="center">Selamat Datang <?= $nama; ?> dari <?= $alamat; ?></h2>
+<body>
+    <h1>Ini adalah view codeigniter 4 salam <?= $nama; ?></h1>
+    <h2>berasal dari <?php echo $alamat; ?></h2>
+    <h2>TTL <?php echo $ttl; ?></h2>
+
 </body>
 </html>

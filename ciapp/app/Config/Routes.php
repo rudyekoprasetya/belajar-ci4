@@ -35,7 +35,7 @@ $routes->setAutoRoute(true);
 $routes->get('/', 'Admin::login');
 
 //membuat route function komentar pada controller web
-$routes->get('/komentar', 'Web::komentar');
+$routes->get('/komen', 'Web::komentar');
 
 //membuat route untuk function nama lengkap dengan uri parameter
 $routes->get('/nama/(:any)/(:num)', 'Web::nama/$1/$2');
@@ -46,6 +46,7 @@ $routes->get('/biodata', 'Web::biodata');
 //route untuk function hitung dan proses
 $routes->get('/hitung', 'Web::hitung');
 $routes->post('/hitung/proses', 'Web::proses');
+
 
 // //route untuk employe
 // $routes->get('/employe', 'Employe::index',['filter' => 'auth']);

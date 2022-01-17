@@ -1,10 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head> 
-    <meta charset="utf-8"> 
-    <title><?= $judul; ?></title>
-</head>
-<body> 
+<?php echo $this->extend('template/layout'); ?>
+
+
+<?php echo $this->section('content'); ?>
+<div class="content"> 
     <h1><?= $judul; ?></h1> 
     <form action="/hitung/proses" method="post"> 
          <?= csrf_field(); ?>
@@ -15,5 +13,5 @@
         </p> 
         <p><button type="submit">HITUNG</button></p> 
     </form>
-</body>
-</html>
+</div>
+<?php echo $this->endSection(); ?>

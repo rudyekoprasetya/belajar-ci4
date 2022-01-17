@@ -17,6 +17,7 @@ class Dashboard extends BaseController {
         return view('dashboard',$data);
     }
 
+
     public function gallery() {
         $data['judul']='Laman Gallery';  
         return view('gallery',$data);

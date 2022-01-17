@@ -16,8 +16,9 @@ class Web extends BaseController {
     }
 
     public function biodata() {
-        $data['nama'] = 'Rudy Eko Prasetya';
-        $data['alamat'] = 'Kediri';
+        $data['nama'] = 'Budi';
+        $data['alamat'] = 'kediri';
+        $data['ttl'] = 'tulungagung, 02 des 1990';
         return view('biodata',$data);
     }
 
@@ -36,4 +37,9 @@ class Web extends BaseController {
         $data['hasil'] = $data['angka1'] * $data['angka2']; 
         return view('kalkulator',$data); 
     }
+
+
+
+
+
 }

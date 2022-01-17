@@ -15,7 +15,7 @@
         <tr>
             <td><?= $row['id_admin'];?></td>
             <td><?= $row['username'];?></td>
-            <td><?= "*******";?></td>
+            <td><?= '*********';?></td>
             <td>
                <a href="/admin/<?= $row['id_admin'];?>/edit">edit</a>  | 
                <a href="/admin/<?= $row['id_admin'];?>/delete" onclick="return confirm('Apakah Yakin?')">delete</a> 

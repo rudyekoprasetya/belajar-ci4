@@ -9,7 +9,7 @@
 <?php foreach($admin as $row): ?>
         <table align="center">
             <tr>
-                <td>ID</td>
+                <td>ID Admin</td>
                 <td><input type="text" name="id_admin" value="<?= $row['id_admin'];?>" readonly></td>
             </tr>
             <tr>
@@ -18,7 +18,7 @@
             </tr>
             <tr>
                 <td>Password</td>
-                <td><input type="password" name="password" value="<?= $row['password'];?>"></td>
+                <td><input type="password" name="password"></td>
             </tr>
             <tr>
                 <td></td>
