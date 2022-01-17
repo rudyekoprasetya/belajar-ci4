@@ -47,21 +47,35 @@ $routes->get('/biodata', 'Web::biodata');
 $routes->get('/hitung', 'Web::hitung');
 $routes->post('/hitung/proses', 'Web::proses');
 
-//route untuk employe
-$routes->get('/employe', 'Employe::index',['filter' => 'auth']);
-$routes->post('/employe/save', 'Employe::save',['filter' => 'auth']);
-//untuk edit dan ubah
-$routes->get('/employe/(:any)/edit', 'Employe::edit/$1',['filter' => 'auth']);
-$routes->put('/employe', 'Employe::update',['filter' => 'auth']);
-//untuk hapus data
-$routes->get('/employe/(:any)/delete', 'Employe::destroy/$1',['filter' => 'auth']);
+// //route untuk employe
+// $routes->get('/employe', 'Employe::index',['filter' => 'auth']);
+// $routes->post('/employe/save', 'Employe::save',['filter' => 'auth']);
+// //untuk edit dan ubah
+// $routes->get('/employe/(:any)/edit', 'Employe::edit/$1',['filter' => 'auth']);
+// $routes->put('/employe', 'Employe::update',['filter' => 'auth']);
+// //untuk hapus data
+// $routes->get('/employe/(:any)/delete', 'Employe::destroy/$1',['filter' => 'auth']);
+
+// route untuk employe
+$routes->get('/employe', 'Employe::index');
+$routes->post('/employe/save', 'Employe::save');
+$routes->get('/employe/(:any)/edit', 'Employe::edit/$1');
+$routes->put('/employe', 'Employe::update');
+$routes->get('/employe/(:any)/delete', 'Employe::destroy/$1');
+
+// route untuk admin
+$routes->get('/admin', 'Admin::index');
+$routes->post('/admin/save', 'Admin::save');
+$routes->get('/admin/(:any)/edit', 'Admin::edit/$1');
+$routes->put('/admin', 'Admin::update');
+$routes->get('/admin/(:any)/delete', 'Admin::destroy/$1');
 
 //untuk autentifikasi dan otorasi
-$routes->get('/register', 'Admin::index');
-$routes->post('/daftar', 'Admin::register');
-$routes->get('/login', 'Admin::login');
-$routes->post('/cek_login', 'Admin::cek_login');
-$routes->get('/logout', 'Admin::logout');
+$routes->get('/register', 'Auth::index');
+$routes->post('/daftar', 'Auth::register');
+$routes->get('/login', 'Auth::login');
+// $routes->post('/cek_login', 'Auth::cek_login');
+// $routes->get('/logout', 'Auth::logout');
 
 //untuk restful api
 $routes->resource('article');

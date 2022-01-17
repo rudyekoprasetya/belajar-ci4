@@ -1854,13 +1854,13 @@ Mudahnya bila digambarkan pada sistem aplikasi, otorisasi memeriksa wewenang dar
 
 Agar lebih paham kali ini kita akan membuat fitur register untuk admin beserta login dan logoutnya (Autentifikasi). Dimana fitur tersebut digunakan untuk melindungi fitur CRUD employe agar bisa diakses oleh yang berhak (Otorisasi) atau admin yang terdaftar saja.
 
-Pertama kita buat model **AdminModel.php** dengan perintah
+Pertama kita buat model **AuthModel.php** dengan perintah
 
 ```console
-php spark make:model AdminModel
+php spark make:model AuthModel
 ```
 
-Kita sesuaikan coding di AdminModel.php sebagai berikut
+Kita sesuaikan coding di AuthModel.php sebagai berikut
 
 ```php
 <?php
@@ -1869,7 +1869,7 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class AdminModel extends Model
+class AuthModel extends Model
 {
     protected $DBGroup              = 'default';
     protected $table                = 'admins';
@@ -1890,12 +1890,12 @@ class AdminModel extends Model
 
 ```
 
-Kemudian kita buat controller **Admin.php** dengan perintah
+Kemudian kita buat controller **Auth.php** dengan perintah
 
 ```console
-php spark make:controller Admin
+php spark make:controller Auth
 ```
-Selanjutnya kita buat function untuk fitur register dan tampilan login pada controller **Admin.php**
+Selanjutnya kita buat function untuk fitur register dan tampilan login pada controller **Auth.php**
 
 ```php
 <?php
@@ -1904,12 +1904,12 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 
-class Admin extends BaseController {
-    protected $adminModel;
+class Auth extends BaseController {
+    protected $authModel;
 
     public function __construct() {
         // load model admin
-        $this->adminModel=new \App\Models\AdminModel();
+        $this->authModel=new \App\Models\AuthModel();
     }
 
     public function index() {
@@ -1959,7 +1959,7 @@ class Admin extends BaseController {
             'password' => password_hash($this->request->getPost('password'), PASSWORD_BCRYPT)
         ];
         //memasukan data dalam database
-        $this->adminModel->insert($data);
+        $this->authModel->insert($data);
 
         //jika berhasil arahkan ke tampilan login
         return redirect()->to('/login');
@@ -2122,14 +2122,14 @@ Jangan lupa kita buat route untuk fitur tersebut, buka file **Routes.php** tamba
 
 ```php
 //untuk autentifikasi dan otorasi
-$routes->get('/register', 'Admin::index');
-$routes->post('/daftar', 'Admin::register');
-$routes->get('/login', 'Admin::login');
+$routes->get('/register', 'Auth::index');
+$routes->post('/daftar', 'Auth::register');
+$routes->get('/login', 'Auth::login');
 ```
 
 Sekarang bukalah url `http://localhost:8080/register` coba inputkan data semisal username admin passwordnya admin. Klik register amatilah yang terjadi. Jika berhasil maka akan di redirect ke laman login
 
-Untuk memastikan datanya masuk. Kita buka `http://localhost/phpmyadmun` coba kua table admins. Perhatikan data didalamnya.
+Untuk memastikan datanya masuk. Kita buka `http://localhost/phpmyadmin` coba buka table admins. Perhatikan data didalamnya.
 
 Selanjutnya kita akan buat fitur untuk menangani login. Silahkan tambahkan function dibawah ini pada controller Admin
 
@@ -2140,7 +2140,7 @@ public function cek_login() {
     $password = $this->request->getPost('password');
 
     //cari data dari tabel admin sesuai username
-    $dataUser=$this->adminModel->where('username',$username)->first();
+    $dataUser=$this->authModel->where('username',$username)->first();
 
     // jika ada
     if($dataUser) {
@@ -2161,7 +2161,7 @@ public function cek_login() {
     }
 }
 ```
-Coding diatas digunakan untuk mencari apakah username dan password yang dimasukan ada dalam database. Hal ini bisa dilihat pada code `$dataUser=$this->adminModel->where('username',$username)->first();`. Kemudian jika username ditemukan langkah selanjutnya adalah verifikasi password yang telah di enkripsi dengan code `password_verify($password,$dataUser['password'])`.
+Coding diatas digunakan untuk mencari apakah username dan password yang dimasukan ada dalam database. Hal ini bisa dilihat pada code `$dataUser=$this->authModel->where('username',$username)->first();`. Kemudian jika username ditemukan langkah selanjutnya adalah verifikasi password yang telah di enkripsi dengan code `password_verify($password,$dataUser['password'])`.
 
 Jika semuanya cocok maka data username dan status login akan disimpan dalam sebuah session dalam server dengan code `session()->set()`. Untuk penjelasan sessio bisa mengacu ke [sini](https://rudyekoprasetya.wordpress.com/2020/03/22/php-dasar-9-1-penggunaan-session-untuk-login/).
 
@@ -2172,12 +2172,12 @@ Jika login berhasil akan diarahkan ke laman CRUD Employe. Namun jika gagal maka 
 Jangan lupa kita tambahkan route baru pada file **Routes.php** untuk fitur login
 
 ```php
-$routes->post('/cek_login', 'Admin::cek_login');
+$routes->post('/cek_login', 'Auth::cek_login');
 ```
 
 Cobalah untuk melakukan login dengan akses yang sudah didaftar kan sebelumnya kemudian amatilah hasilnya jika kita coba memasukan akses yang salah.
 
-Ada login pasti ada logout. Untuk membuatnya tambahkan function berikut ini pada controller **Admin.php**
+Ada login pasti ada logout. Untuk membuatnya tambahkan function berikut ini pada controller **Auth.php**
 
 ```php
 public function logout() {
@@ -2208,7 +2208,7 @@ Untuk Link logout silahkan buka file view template kita pada **sidebar.php** tam
 Jangan lupa tambahkan route nya pada file **Routes.php**
 
 ```php
-$routes->get('/logout', 'Admin::logout');
+$routes->get('/logout', 'Auth::logout');
 ```
 
 Cobalah untuk klik link **logout** pada menu dan amatilah hasilnya.
