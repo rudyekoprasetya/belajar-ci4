@@ -75,8 +75,8 @@ $routes->get('/admin/(:any)/delete', 'Admin::destroy/$1');
 $routes->get('/register', 'Auth::index');
 $routes->post('/daftar', 'Auth::register');
 $routes->get('/login', 'Auth::login');
-// $routes->post('/cek_login', 'Auth::cek_login');
-// $routes->get('/logout', 'Auth::logout');
+$routes->post('/cek_login', 'Auth::cek_login');
+$routes->get('/logout', 'Auth::logout');
 
 //untuk restful api
 $routes->resource('article');

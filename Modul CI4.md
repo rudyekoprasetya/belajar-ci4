@@ -2138,32 +2138,36 @@ Sekarang bukalah url `http://localhost:8080/register` coba inputkan data semisal
 
 Untuk memastikan datanya masuk. Kita buka `http://localhost/phpmyadmin` coba buka table admins. Perhatikan data didalamnya.
 
-Selanjutnya kita akan buat fitur untuk menangani login. Silahkan tambahkan function dibawah ini pada controller Admin
+Selanjutnya kita akan buat fitur untuk menangani login. Silahkan tambahkan function dibawah ini pada controller **Auth.php**
 
 ```php
 public function cek_login() {
     //ambil data dari form
-    $username = $this->request->getPost('username');
-    $password = $this->request->getPost('password');
+    $username=$this->request->getPost('username');
+    $password=$this->request->getPost('password');
 
-    //cari data dari tabel admin sesuai username
     $dataUser=$this->authModel->where('username',$username)->first();
 
-    // jika ada
+    //jika user ada
     if($dataUser) {
-        //jika password sesuai
+        //verfikasi password apakah password yang dimasukan sama di db
         if(password_verify($password,$dataUser['password'])) {
-            //masukan session untuk username dan status login
+            //set session
             session()->set([
                 'username' => $username,
-                'logged_in' =>true
+                'logged_in' => true
             ]);
-            //masukan ke laman crud employe
+
+            //jika berhasil masuk ke laman crud employe
             return redirect()->to('/employe');
-        } 
-    } else { //jika  salah
+        } else { //jika password
+            //kembali ke login dan berikan pesan error
+            session()->setFlashdata('error', 'Password Salah');
+            return redirect()->back();
+        }
+    } else { //jika user tidak ditemukan dalam database
         //kembali ke login dan berikan pesan error
-        session()->setFlashdata('error', 'Username & Password Salah');
+        session()->setFlashdata('error', 'Username tidak ditemukan');
         return redirect()->back();
     }
 }
