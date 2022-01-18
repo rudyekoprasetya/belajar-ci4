@@ -32,7 +32,7 @@ $routes->setAutoRoute(true);
 // We get a performance increase by specifying the default
 // route since we don't have to scan directories.
 // $routes->get('/', 'Home::index');
-$routes->get('/', 'Admin::login');
+$routes->get('/', 'Auth::login');
 
 //membuat route function komentar pada controller web
 $routes->get('/komen', 'Web::komentar');
@@ -47,29 +47,32 @@ $routes->get('/biodata', 'Web::biodata');
 $routes->get('/hitung', 'Web::hitung');
 $routes->post('/hitung/proses', 'Web::proses');
 
+//untuk dashboard biar di filter
+$routes->get('/dashboard', 'Dashboard::index',['filter' => 'auth']);
+$routes->get('/dashboard/gallery', 'Dashboard::gallery',['filter' => 'auth']);
+$routes->get('/dashboard/about', 'Dashboard::about',['filter' => 'auth']);
 
-// //route untuk employe
-// $routes->get('/employe', 'Employe::index',['filter' => 'auth']);
-// $routes->post('/employe/save', 'Employe::save',['filter' => 'auth']);
-// //untuk edit dan ubah
-// $routes->get('/employe/(:any)/edit', 'Employe::edit/$1',['filter' => 'auth']);
-// $routes->put('/employe', 'Employe::update',['filter' => 'auth']);
-// //untuk hapus data
-// $routes->get('/employe/(:any)/delete', 'Employe::destroy/$1',['filter' => 'auth']);
+
+//route untuk employe
+$routes->get('/employe', 'Employe::index',['filter' => 'auth']);
+$routes->post('/employe/save', 'Employe::save',['filter' => 'auth']);
+$routes->get('/employe/(:any)/edit', 'Employe::edit/$1',['filter' => 'auth']);
+$routes->put('/employe', 'Employe::update',['filter' => 'auth']);
+$routes->get('/employe/(:any)/delete', 'Employe::destroy/$1',['filter' => 'auth']);
 
 // route untuk employe
-$routes->get('/employe', 'Employe::index');
-$routes->post('/employe/save', 'Employe::save');
-$routes->get('/employe/(:any)/edit', 'Employe::edit/$1');
-$routes->put('/employe', 'Employe::update');
-$routes->get('/employe/(:any)/delete', 'Employe::destroy/$1');
+// $routes->get('/employe', 'Employe::index');
+// $routes->post('/employe/save', 'Employe::save');
+// $routes->get('/employe/(:any)/edit', 'Employe::edit/$1');
+// $routes->put('/employe', 'Employe::update');
+// $routes->get('/employe/(:any)/delete', 'Employe::destroy/$1');
 
 // route untuk admin
-$routes->get('/admin', 'Admin::index');
-$routes->post('/admin/save', 'Admin::save');
-$routes->get('/admin/(:any)/edit', 'Admin::edit/$1');
-$routes->put('/admin', 'Admin::update');
-$routes->get('/admin/(:any)/delete', 'Admin::destroy/$1');
+$routes->get('/admin', 'Admin::index',['filter' => 'auth']);
+$routes->post('/admin/save', 'Admin::save',['filter' => 'auth']);
+$routes->get('/admin/(:any)/edit', 'Admin::edit/$1',['filter' => 'auth']);
+$routes->put('/admin', 'Admin::update',['filter' => 'auth']);
+$routes->get('/admin/(:any)/delete', 'Admin::destroy/$1',['filter' => 'auth']);
 
 //untuk autentifikasi dan otorasi
 $routes->get('/register', 'Auth::index');
